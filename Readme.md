@@ -1,7 +1,7 @@
 # Проект «Киноман»
 
 * Студент: [Анна Калинина](https://up.htmlacademy.ru/ecmascript/15/user/1763499).
-* Наставник: `Неизвестно`.
+* Наставник: [Денис Горшков](https://htmlacademy.ru/profile/satrasmatras).
 
 ---
 
