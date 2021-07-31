@@ -10,7 +10,7 @@ import { createTopFilmTemplate } from './view/topFilms.js';
 import { createMostCommentedFilmsTemplate } from './view/mostCommentedFilms.js';
 import { createNumbersFilms } from './view/numbersFilms.js';
 import { createPopupTemplate } from './view/popup.js';
-
+import { generateCardFilms } from './data.js';
 const INSERT_PLACE = {
   beforeend: 'beforeend',
   afterend: 'afterend',
@@ -19,6 +19,8 @@ const INSERT_PLACE = {
 };
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
+const COUNT = 5;
+const films = new Array(COUNT).fill().map(generateCardFilms);
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -30,7 +32,7 @@ const siteSectionElement = siteMainElement.querySelector('.films');
 const siteSectionFilmsElement = siteSectionElement.querySelector('.films-list');
 const siteDivContainerElement = siteSectionFilmsElement.querySelector('.films-list__container');
 for (let i = 1; i <= 5; i++) {
-  render(siteDivContainerElement, createFilmTemplate(), INSERT_PLACE.beforeend);
+  render(siteDivContainerElement, createFilmTemplate(films[i-1]), INSERT_PLACE.beforeend);
 }
 render(siteSectionFilmsElement, createButtonTemplate(), INSERT_PLACE.beforeend);
 render(siteSectionElement, createAdditionalContainer(TOP_NAME), INSERT_PLACE.beforeend);
