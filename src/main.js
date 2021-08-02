@@ -10,7 +10,8 @@ import { createTopFilmTemplate } from './view/topFilms.js';
 import { createMostCommentedFilmsTemplate } from './view/mostCommentedFilms.js';
 import { createNumbersFilms } from './view/numbersFilms.js';
 import { createPopupTemplate } from './view/popup.js';
-import { generateCardFilms } from './data.js';
+import { generatePopupData } from './mock/popup-data.js';
+
 const INSERT_PLACE = {
   beforeend: 'beforeend',
   afterend: 'afterend',
@@ -20,7 +21,7 @@ const INSERT_PLACE = {
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
 const COUNT = 5;
-const films = new Array(COUNT).fill().map(generateCardFilms);
+const films = new Array(COUNT).fill().map(generatePopupData);
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
@@ -51,4 +52,4 @@ const siteFooterElement = document.querySelector('.footer');
 const siteFooterSectionElement = siteFooterElement.querySelector('.footer__statistics');
 render(siteFooterSectionElement, createNumbersFilms(), INSERT_PLACE.beforeend);
 const siteBodyElement = document.querySelector('body');
-render(siteBodyElement, createPopupTemplate(), INSERT_PLACE.beforeend);
+render(siteBodyElement, createPopupTemplate(generatePopupData()), INSERT_PLACE.beforeend);
