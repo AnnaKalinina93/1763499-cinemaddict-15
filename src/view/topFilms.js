@@ -22,7 +22,7 @@ export const createTopFilmTemplate = (film) => {
   const favoritesClassName = isFavorites
     ? 'film-card__controls-item--active'
     : '';
-return `<article class="film-card">
+  return `<article class="film-card">
   <h3 class="film-card__title">${name}</h3>
   <p class="film-card__rating">${rating}</p>
   <p class="film-card__info">
