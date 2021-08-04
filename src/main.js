@@ -2,43 +2,36 @@ import { render } from './utils/render.js';
 import { createLogoTemplate } from './view/logo.js';
 import { createMenuTemplate } from './view/menu.js';
 import { createSortTemplate } from './view/sort.js';
-import { createFilmTemplate } from './view/films.js';
-import { createFilmsContainer } from './view/filmcontainer.js';
+import { createFilmTemplate } from './view/film.js';
+import { createFilmsContainer } from './view/film-container.js';
 import { createButtonTemplate } from './view/button.js';
 import { createAdditionalContainer } from './view/additional-containers.js';
-import { createTopFilmTemplate } from './view/topFilms.js';
-import { createMostCommentedFilmsTemplate } from './view/mostCommentedFilms.js';
-import { createNumbersFilms } from './view/numbersFilms.js';
+import { createNumbersFilms } from './view/numbers-films.js';
 import { createPopupTemplate } from './view/popup.js';
-import { generatePopupData } from './mock/popup-data.js';
+import { generateData } from './mock/data-film.js';
 
-const INSERT_PLACE = {
-  beforeend: 'beforeend',
-  afterend: 'afterend',
-  beforebegin: 'beforebegin',
-  afterbegin: 'afterbegin',
-};
+const BEFORE_END = 'beforeend';
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
 const COUNT = 15;
 const COUNT_PER_STEP = 5;
-const films = new Array(COUNT).fill().map(generatePopupData);
+const films = new Array(COUNT).fill().map(generateData);
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
-render(siteHeaderElement, createLogoTemplate(), INSERT_PLACE.beforeend);
-render(siteMainElement, createMenuTemplate(films), INSERT_PLACE.beforeend);
-render(siteMainElement, createSortTemplate(), INSERT_PLACE.beforeend);
-render(siteMainElement, createFilmsContainer(), INSERT_PLACE.beforeend);
+render(siteHeaderElement, createLogoTemplate(), BEFORE_END);
+render(siteMainElement, createMenuTemplate(films), BEFORE_END);
+render(siteMainElement, createSortTemplate(), BEFORE_END);
+render(siteMainElement, createFilmsContainer(), BEFORE_END);
 const siteSectionElement = siteMainElement.querySelector('.films');
 const siteSectionFilmsElement = siteSectionElement.querySelector('.films-list');
 const siteDivContainerElement = siteSectionFilmsElement.querySelector('.films-list__container');
 for (let i = 1; i <= Math.min(films.length, COUNT_PER_STEP); i++) {
-  render(siteDivContainerElement, createFilmTemplate(films[i - 1]), INSERT_PLACE.beforeend);
+  render(siteDivContainerElement, createFilmTemplate(films[i - 1]), BEFORE_END);
 }
 if (films.length > COUNT_PER_STEP) {
   let renderedCount = COUNT_PER_STEP;
-  render(siteSectionFilmsElement, createButtonTemplate(), INSERT_PLACE.beforeend);
+  render(siteSectionFilmsElement, createButtonTemplate(), BEFORE_END);
 
   const showMoreButton = siteSectionFilmsElement.querySelector('.films-list__show-more');
 
@@ -46,7 +39,7 @@ if (films.length > COUNT_PER_STEP) {
     evt.preventDefault();
     films
       .slice(renderedCount, renderedCount + COUNT_PER_STEP)
-      .forEach((film) => render(siteDivContainerElement, createFilmTemplate(film), INSERT_PLACE.beforeend));
+      .forEach((film) => render(siteDivContainerElement, createFilmTemplate(film), BEFORE_END));
 
     renderedCount += COUNT_PER_STEP;
 
@@ -55,30 +48,30 @@ if (films.length > COUNT_PER_STEP) {
     }
   });
 }
-render(siteSectionElement, createAdditionalContainer(TOP_NAME), INSERT_PLACE.beforeend);
+render(siteSectionElement, createAdditionalContainer(TOP_NAME), BEFORE_END);
 const siteSectionTopFilmsElement = siteSectionElement.querySelector('.films-list--extra');
 const siteTopDivContainerElement = siteSectionTopFilmsElement.querySelector('.films-list__container');
-const topFilms = films.sort((a, b) => b.rating - a.rating);
+const topFilms = [...films].sort((a, b) => b.rating - a.rating);
 for (let i = 1; i <= 2; i++) {
-  render(siteTopDivContainerElement, createTopFilmTemplate(topFilms[i]), INSERT_PLACE.beforeend);
+  render(siteTopDivContainerElement, createFilmTemplate(topFilms[i]), BEFORE_END);
 }
-render(siteSectionElement, createAdditionalContainer(MOST_COMMENTED_NAME), INSERT_PLACE.beforeend);
+render(siteSectionElement, createAdditionalContainer(MOST_COMMENTED_NAME), BEFORE_END);
 const siteSectionFilmsElements = siteSectionElement.querySelectorAll('.films-list--extra');
 const siteMostCommentedDivContainerElement = siteSectionFilmsElements[1].querySelector('.films-list__container');
-const mostCommentedFilms =  films.sort((a, b) => b.comments.length - a.comments.length);
+const mostCommentedFilms = [...films].sort((a, b) => b.comments.length - a.comments.length);
 for (let i = 1; i <= 2; i++) {
-  render(siteMostCommentedDivContainerElement, createMostCommentedFilmsTemplate(mostCommentedFilms[i]), INSERT_PLACE.beforeend);
+  render(siteMostCommentedDivContainerElement, createFilmTemplate(mostCommentedFilms[i]), BEFORE_END);
 }
 const siteFooterElement = document.querySelector('.footer');
 const siteFooterSectionElement = siteFooterElement.querySelector('.footer__statistics');
-render(siteFooterSectionElement, createNumbersFilms(films), INSERT_PLACE.beforeend);
+render(siteFooterSectionElement, createNumbersFilms(films), BEFORE_END);
 const siteBodyElement = document.querySelector('body');
-render(siteBodyElement, createPopupTemplate(films[0]), INSERT_PLACE.beforeend);
+render(siteBodyElement, createPopupTemplate(films[0]), BEFORE_END);
 const popupElement = siteBodyElement.querySelector('.film-details');
 const popupCloseButton = popupElement.querySelector('.film-details__close-btn');
 popupCloseButton.addEventListener('click', (evt) => {
   evt.preventDefault();
-  popupElement.style.display='none';
+  popupElement.style.display = 'none';
 });
 
 

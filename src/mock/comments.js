@@ -1,4 +1,5 @@
 import { getRandomInteger, getRandomArrayElement} from '../utils/get-random.js';
+import { generateDate } from '../day.js';
 import dayjs from 'dayjs';
 const TEXT = [
   'Interesting setting and a good cast',
@@ -18,14 +19,9 @@ const AVTOR = [
   'Sam Smit',
   'Robert Shenisy',
 ];
-const generateData = () => {
-  const maxDaysGap = 7;
-  const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
-  const hoursGap =  getRandomInteger(-12,12);
-  return dayjs().add(daysGap, 'day').add(hoursGap, 'hour').toDate();
-};
+
 const getComments = () => {
-  const dueDate = generateData();
+  const dueDate = generateDate();
   return {
     id: getRandomInteger(1,5),
     text: getRandomArrayElement(TEXT),

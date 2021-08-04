@@ -3,9 +3,9 @@ export const createMenuTemplate = (films) => {
   let historyCounter = 0;
   let favoritesCounter = 0;
   films.forEach((film) => {
-    watchlistCounter = film.isWatchlist ? watchlistCounter += 1 : watchlistCounter;
-    historyCounter = film.isWatched ? historyCounter += 1 : historyCounter;
-    favoritesCounter = film.isFavorites ? favoritesCounter += 1 : favoritesCounter;
+    watchlistCounter = film.userDetails.watchlist ? watchlistCounter += 1 : watchlistCounter;
+    historyCounter = film.userDetails.alreadyWatched ? historyCounter += 1 : historyCounter;
+    favoritesCounter = film.userDetails.favorite ? favoritesCounter += 1 : favoritesCounter;
   });
   return `<nav class="main-navigation">
     <div class="main-navigation__items">

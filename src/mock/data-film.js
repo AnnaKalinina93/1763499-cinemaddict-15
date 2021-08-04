@@ -1,7 +1,9 @@
 import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/get-random.js';
 import { getComments } from './comments';
+import dayjs from 'dayjs';
+import { generateDate } from '../day.js';
 
-const NAME_FILMS = [
+const TITLES = [
   'Made for each other',
   'Popeye meets sinbad',
   'Sagebrush trail',
@@ -36,7 +38,7 @@ const GENRES = [
   'Thriller',
   'Musical',
 ];
-const DIRECTOR = [
+const DIRECTORS = [
   'Anthony Mann',
   'Jon Cromvel',
   'Armand Shafer',
@@ -56,35 +58,44 @@ const ACTORS = [
   'Megan Fox',
   'Bred Pit',
 ];
-const COUNTRY = [
+const COUNTRIES = [
   'USA',
   'Ftanch',
   'Germany',
   'Italy',
 ];
 
-const generatePopupData = () => {
-  const COUNT = getRandomInteger(1,5);
+const generateData = () => {
+  const COUNT = getRandomInteger(1, 5);
   const comments = new Array(COUNT).fill().map(getComments);
-  const name = getRandomArrayElement(NAME_FILMS);
+  const title = getRandomArrayElement(TITLES);
+  const date = generateDate();
   return {
-    name,
-    originalName: name,
-    poster: getRandomArrayElement(POSTERS),
-    description: getRandomArray(DESCRIPTIONS).join(' '),
-    director: getRandomArrayElement(DIRECTOR),
-    writers: getRandomArray(WRITERS).join(', '),
-    actors: getRandomArray(ACTORS).join(', '),
-    rating: getRandomFractionalNumber(0, 10, 1),
-    releaseDate: `${getRandomInteger(1, 31)} April ${getRandomInteger(1930, 2021)} years`,
-    runTime: `${getRandomInteger(0, 2)}h ${getRandomInteger(0, 59)}m`,
-    country: getRandomArrayElement(COUNTRY),
-    genres: getRandomArray(GENRES),
-    age: getRandomInteger(12, 18),
-    isWatchlist: Boolean(getRandomInteger(0, 1)),
-    isWatched: Boolean(getRandomInteger(0, 1)),
-    isFavorites: Boolean(getRandomInteger(0, 1)),
+    id: getRandomInteger(0, 50),
     comments,
+    filmInfo: {
+      title,
+      alternativeTitle: title,
+      totalRating: getRandomFractionalNumber(0, 10, 1),
+      poster: getRandomArrayElement(POSTERS),
+      ageRating: getRandomInteger(0, 18),
+      director: getRandomArrayElement(DIRECTORS),
+      writers: getRandomArray(WRITERS).join(', '),
+      actors: getRandomArray(ACTORS).join(', '),
+      release: {
+        date,
+        releaseCountry: getRandomArrayElement(COUNTRIES),
+      },
+      runTime: getRandomInteger(0, 300),
+      genres: getRandomArray(GENRES),
+      description: getRandomArray(DESCRIPTIONS).join(' '),
+    },
+    userDetails: {
+      watchlist: Boolean(getRandomInteger(0, 1)),
+      alreadyWatched: Boolean(getRandomInteger(0, 1)),
+      watchingDate:dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
+      favorite:  Boolean(getRandomInteger(0, 1)),
+    },
   };
 };
-export { generatePopupData };
+export { generateData };
