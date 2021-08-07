@@ -8,7 +8,7 @@ const generateDate = () => {
   const hoursGap =  getRandomInteger(-12,12);
   return dayjs().add(daysGap, 'day').add(yearsGap, 'year').add(hoursGap, 'hour').toDate();
 };
-const getFullDateFormat = (dueDate) => dayjs(dueDate).format('D MMMM YYYY');
-const getYearsDateFormat = (dueDate) => dayjs(dueDate).format('YYYY');
-
-export {generateDate, getFullDateFormat, getYearsDateFormat};
+const getDayMonthFormat = (dueDate) => dayjs(dueDate).format('D MMMM');
+const getYearsFormat = (dueDate) => dayjs(dueDate).format('YYYY');
+const getTimeFormat = (dueDate) => dayjs(dueDate).format('HH:MM');
+export {generateDate, getDayMonthFormat, getYearsFormat , getTimeFormat};

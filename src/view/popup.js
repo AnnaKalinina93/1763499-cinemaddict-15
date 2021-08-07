@@ -1,18 +1,43 @@
-import { getFullDateFormat } from '../day.js';
+import { getDayMonthFormat, getYearsFormat } from '../day.js';
 import { transformTime } from '../utils/time-format';
 
 const createPopupTemplate = (film) => {
+  const {
+    comments,
+    filmInfo: {
+      title,
+      totalRating,
+      poster,
+      alternativeTitle,
+      ageRating,
+      director,
+      writers,
+      actors,
+      release: {
+        date,
+        releaseCountry,
+      },
+      runTime,
+      genres,
+      description,
+    },
+    userDetails: {
+      watchlist,
+      alreadyWatched,
+      favorite,
+    },
+  } = film;
 
-  const watchlistClassName = film.userDetails.watchlist
+  const watchlistClassName = watchlist
     ? 'film-details__control-button--active'
     : '';
-  const watchedClassName = film.userDetails.alreadyWatched
+  const watchedClassName = alreadyWatched
     ? 'film-details__control-button--active'
     : '';
-  const favoritesClassName = film.userDetails.favorite
+  const favoritesClassName = favorite
     ? 'film-details__control-button--active'
     : '';
-  const isGenres = film.filmInfo.genres.length === 1
+  const isGenres = genres.length === 1
     ? 'Genre'
     : 'Genres';
   return `<section class="film-details">
@@ -23,57 +48,57 @@ const createPopupTemplate = (film) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src=${film.filmInfo.poster} alt="">
+          <img class="film-details__poster-img" src=${poster} alt="">
 
-          <p class="film-details__age">${film.filmInfo.ageRating}+</p>
+          <p class="film-details__age">${ageRating}+</p>
         </div>
 
         <div class="film-details__info">
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
-              <h3 class="film-details__title">${film.filmInfo.title}</h3>
-              <p class="film-details__title-original">Original: ${film.filmInfo.alternativeTitle}</p>
+              <h3 class="film-details__title">${title}</h3>
+              <p class="film-details__title-original">Original: ${alternativeTitle}</p>
             </div>
 
             <div class="film-details__rating">
-              <p class="film-details__total-rating">${film.filmInfo.totalRating}</p>
+              <p class="film-details__total-rating">${totalRating}</p>
             </div>
           </div>
 
           <table class="film-details__table">
             <tr class="film-details__row">
               <td class="film-details__term">Director</td>
-              <td class="film-details__cell">${film.filmInfo.director}</td>
+              <td class="film-details__cell">${director}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${film.filmInfo.writers}</td>
+              <td class="film-details__cell">${writers}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${film.filmInfo.actors}</td>
+              <td class="film-details__cell">${actors}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${getFullDateFormat(film.filmInfo.release.date)}</td>
+              <td class="film-details__cell">${getDayMonthFormat(date)} ${getYearsFormat(date)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${transformTime(film.filmInfo.runTime)}</td>
+              <td class="film-details__cell">${transformTime(runTime)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
-              <td class="film-details__cell">${film.filmInfo.release.releaseCountry}</td>
+              <td class="film-details__cell">${releaseCountry}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">${isGenres}</td>
               <td class="film-details__cell" style="font-size:0">
-              ${film.filmInfo.genres.map((genre) => `<span class="film-details__genre" style="font-size:21px">${genre}</span>`)}
+              ${genres.map((genre) => `<span class="film-details__genre" style="font-size:21px">${genre}</span>`)}
               </td>
             </tr>
           </table>
 
-          <p class="film-details__film-description">${film.filmInfo.description}</p>
+          <p class="film-details__film-description">${description}</p>
         </div>
       </div>
 
@@ -86,10 +111,10 @@ const createPopupTemplate = (film) => {
 
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
-        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${film.comments.length}</span></h3>
+        <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
 
         <ul class="film-details__comments-list" style="font-size:0" >
-        ${film.comments.map((comment) =>
+        ${comments.map((comment) =>
     ` <li class="film-details__comment">
           <span class="film-details__comment-emoji">
             <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
