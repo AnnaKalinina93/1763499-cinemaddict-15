@@ -1,7 +1,8 @@
 import { getYearsFormat } from '../day';
 import { transformTime } from '../utils/time-format';
+import { createElement } from '../utils/render';
 
-export const createFilmTemplate = (film) => {
+const createFilmTemplate = (film) => {
   const {
     comments,
     filmInfo: {
@@ -49,3 +50,25 @@ export const createFilmTemplate = (film) => {
         </div>
       </article>`;
 };
+export default class SiteFilmCard {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

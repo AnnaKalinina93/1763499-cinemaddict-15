@@ -1,4 +1,5 @@
 import { getDayMonthFormat, getYearsFormat } from '../day.js';
+import { createElement } from '../utils/render';
 import { transformTime } from '../utils/time-format';
 
 const createPopupTemplate = (film) => {
@@ -166,4 +167,26 @@ const createPopupTemplate = (film) => {
   </form>
 </section>`;
 };
-export { createPopupTemplate };
+export default class SitePopup {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPopupTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+

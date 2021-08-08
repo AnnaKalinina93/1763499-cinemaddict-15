@@ -1,16 +1,15 @@
-/* eslint-disable quotes */
 import { createElement } from '../utils/render';
-const createNumbersFilms = (films) => (
-  `<p>${films.length} movies inside</p>`
+const filmListContainer = () => (
+  `<div class="films-list__container">
+  </div>`
 );
-export default class SitePopup {
-  constructor(films) {
-    this._films = films;
+export default class SiteFilmListContainer {
+  constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createNumbersFilms(this._films);
+    return filmListContainer();
   }
 
   getElement() {
@@ -25,5 +24,3 @@ export default class SitePopup {
     this._element = null;
   }
 }
-
-
