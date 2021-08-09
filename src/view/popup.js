@@ -167,7 +167,7 @@ const createPopupTemplate = (film) => {
   </form>
 </section>`;
 };
-export default class SitePopup {
+export default class Popup {
   constructor(film) {
     this._film = film;
     this._element = null;

@@ -63,16 +63,16 @@ const COUNTRIES = [
   'Germany',
   'Italy',
 ];
-const currentId = 1;
+let currentId = 1;
 
 const generateData = () => {
   const COUNT = getRandomInteger(1, 5);
   const comments = new Array(COUNT).fill().map(getComments);
   const title = getRandomArrayElement(TITLES);
   const date = generateDate();
-  let id = 0;
+  currentId =+ currentId;
   return {
-    id: id++,
+    id: currentId,
     comments,
     filmInfo: {
       title,
@@ -92,10 +92,10 @@ const generateData = () => {
       description: getRandomArray(DESCRIPTIONS).join(' '),
     },
     userDetails: {
-      watchlist: Boolean(getRandomInteger(0, currentId)),
-      alreadyWatched: Boolean(getRandomInteger(0, currentId)),
-      watchingDate: ` ${getDayMonthFormat} ${getYearsFormat} ${getTimeFormat(date)}`,
-      favorite:  Boolean(getRandomInteger(0, currentId)),
+      watchlist: Boolean(getRandomInteger(0, 1)),
+      alreadyWatched: Boolean(getRandomInteger(0, 1)),
+      watchingDate: date,
+      favorite:  Boolean(getRandomInteger(0, 1)),
     },
   };
 };
