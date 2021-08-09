@@ -1,6 +1,6 @@
 import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/get-random.js';
 import { getComments } from './comments';
-import { generateDate, getTimeFormat, getDayMonthFormat, getYearsFormat } from '../day.js';
+import { generateDate} from '../day.js';
 
 const TITLES = [
   'Made for each other',
