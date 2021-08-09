@@ -1,6 +1,6 @@
 import { getRandomInteger, getRandomArrayElement} from '../utils/get-random.js';
-import { generateDate } from '../day.js';
-import dayjs from 'dayjs';
+import { generateDate,  getTimeFormat, getDayMonthFormat } from '../day.js';
+
 const TEXT = [
   'Interesting setting and a good cast',
   'Booooooooooring',
@@ -27,7 +27,7 @@ const getComments = () => {
     text: getRandomArrayElement(TEXT),
     emoji: getRandomArrayElement(EMOJI),
     avtor: getRandomArrayElement(AVTOR),
-    dueDate:  dayjs(dueDate).format('D MMMM HH:MM'),
+    dueDate:`${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
   };
 };
 

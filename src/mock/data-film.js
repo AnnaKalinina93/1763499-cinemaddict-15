@@ -1,7 +1,6 @@
 import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/get-random.js';
 import { getComments } from './comments';
-import dayjs from 'dayjs';
-import { generateDate } from '../day.js';
+import { generateDate, getTimeFormat, getDayMonthFormat, getYearsFormat } from '../day.js';
 
 const TITLES = [
   'Made for each other',
@@ -64,14 +63,16 @@ const COUNTRIES = [
   'Germany',
   'Italy',
 ];
+const currentId = 1;
 
 const generateData = () => {
   const COUNT = getRandomInteger(1, 5);
   const comments = new Array(COUNT).fill().map(getComments);
   const title = getRandomArrayElement(TITLES);
   const date = generateDate();
+  let id = 0;
   return {
-    id: getRandomInteger(0, 50),
+    id: id++,
     comments,
     filmInfo: {
       title,
@@ -91,10 +92,10 @@ const generateData = () => {
       description: getRandomArray(DESCRIPTIONS).join(' '),
     },
     userDetails: {
-      watchlist: Boolean(getRandomInteger(0, 1)),
-      alreadyWatched: Boolean(getRandomInteger(0, 1)),
-      watchingDate:dayjs(generateDate()).format('D MMMM YYYY HH:MM'),
-      favorite:  Boolean(getRandomInteger(0, 1)),
+      watchlist: Boolean(getRandomInteger(0, currentId)),
+      alreadyWatched: Boolean(getRandomInteger(0, currentId)),
+      watchingDate: ` ${getDayMonthFormat} ${getYearsFormat} ${getTimeFormat(date)}`,
+      favorite:  Boolean(getRandomInteger(0, currentId)),
     },
   };
 };
