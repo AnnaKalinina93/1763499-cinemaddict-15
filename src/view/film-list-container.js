@@ -1,15 +1,15 @@
 import { createElement } from '../utils/render';
-const filmListContainer = () => (
+const createfilmListContainer = () => (
   `<div class="films-list__container">
   </div>`
 );
-export default class SiteFilmListContainer {
+export default class FilmListContainer {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return filmListContainer();
+    return createfilmListContainer();
   }
 
   getElement() {

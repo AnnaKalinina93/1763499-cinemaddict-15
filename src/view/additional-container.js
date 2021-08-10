@@ -5,7 +5,7 @@ const createAdditionalContainer = (listName) => (
      <h2 class="films-list__title">${listName}</h2>
    </section> `
 );
-export default class SiteAdditionalContainer {
+export default class AdditionalContainer {
   constructor(listName) {
     this._listName = listName;
     this._element = null;

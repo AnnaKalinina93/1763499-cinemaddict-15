@@ -1,16 +1,16 @@
 import { createElement } from '../utils/render';
-const createNameFilmListTeplate = () => (
+const createNameFilmListTemplate = () => (
   `<section class="films-list">
     <h2 class="films-list__title visually-hidden">All movies. Upcoming</h2>
    </section>`
 );
-export default class SiteNameFilmList {
+export default class NameFilmList {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createNameFilmListTeplate();
+    return createNameFilmListTemplate();
   }
 
   getElement() {

@@ -19,7 +19,7 @@ const createMenuTemplate = (films) => {
     <a href="#stats" class="main-navigation__additional">Stats</a>
   </nav>`;
 };
-export default class SiteMenu {
+export default class Menu {
   constructor(films) {
     this._filters = films;
     this._element = null;

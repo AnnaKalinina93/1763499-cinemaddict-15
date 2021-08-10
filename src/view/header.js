@@ -1,16 +1,19 @@
-/* eslint-disable quotes */
 import { createElement } from '../utils/render';
 
-const createButtonTemplate = () => (
-  `<button class="films-list__show-more">Show more</button>`
+const createHeaderTemplate = () => (
+  `<section class="header__profile profile">
+    <p class="profile__rating">Movie Buff</p>
+    <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+  </section>`
 );
-export default class Button {
+
+export default class Header {
   constructor() {
     this._element = null;
   }
 
   getTemplate() {
-    return createButtonTemplate();
+    return createHeaderTemplate();
   }
 
   getElement() {
