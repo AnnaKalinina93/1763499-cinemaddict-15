@@ -1,4 +1,4 @@
-import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/get-random.js';
+import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/common.js';
 import { getComments } from './comments';
 import { generateDate} from '../day.js';
 
@@ -70,7 +70,7 @@ const generateData = () => {
   const comments = new Array(COUNT).fill().map(getComments);
   const title = getRandomArrayElement(TITLES);
   const date = generateDate();
-  currentId =+ currentId;
+  currentId += 1;
   return {
     id: currentId,
     comments,

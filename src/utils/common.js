@@ -22,5 +22,5 @@ const getRandomArray = (array) => {
   const newArray = array.filter(() => getRandomInteger(0, 1));
   return newArray !== null ? newArray : getRandomArrayElement(array);
 };
-
-export { getRandomArrayElement, getRandomInteger, getRandomArray, getRandomFractionalNumber };
+const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+export { getRandomArrayElement, getRandomInteger, getRandomArray, getRandomFractionalNumber, isEscape };
