@@ -1,28 +1,16 @@
 /* eslint-disable quotes */
-import { createElement } from '../utils/render';
+import AbstractView from './abstract';
 const createNumbersFilmsTemplate = (films) => (
   `<p>${films.length} movies inside</p>`
 );
-export default class NumbersFilms {
+export default class NumbersFilms extends AbstractView {
   constructor(films) {
+    super();
     this._films = films;
-    this._element = null;
   }
 
   getTemplate() {
     return createNumbersFilmsTemplate(this._films);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

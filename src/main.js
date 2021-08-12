@@ -12,7 +12,7 @@ import NumbersFilmsView from './view/numbers-films.js';
 import NoFilmsView from './view/no-films.js';
 import { generateData } from './mock/data-film.js';
 import { render, InsertPlace } from './utils/render.js';
-
+import { isEscape } from './utils/common.js';
 
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
@@ -40,7 +40,7 @@ const renderFilm = (filmListElement, film) => {
     popupComponent.getElement().remove();
 
   };
-  const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
 
   const onEscKeyDown = (evt) => {
     if (isEscape(evt)) {
@@ -49,19 +49,19 @@ const renderFilm = (filmListElement, film) => {
       document.removeEventListener('keydown', onEscKeyDown);
     }
   };
-  filmComponent.getElement().querySelector('.film-card__title').addEventListener('click', () => {
+  filmComponent.setClickHandlerTitle(() => {
     openPopupFilm();
     document.addEventListener('keydown', onEscKeyDown);
   });
-  filmComponent.getElement().querySelector('.film-card__poster').addEventListener('click', () => {
+  filmComponent.setClickHandlerPoster(() => {
     openPopupFilm();
     document.addEventListener('keydown', onEscKeyDown);
   });
-  filmComponent.getElement().querySelector('.film-card__comments').addEventListener('click', () => {
+  filmComponent.setClickHandlerCommens(() => {
     openPopupFilm();
     document.addEventListener('keydown', onEscKeyDown);
   });
-  popupComponent.getElement().querySelector('.film-details__close-btn').addEventListener('click', () => {
+  popupComponent.setClickHandler(() => {
     closePopupFilm();
     document.removeEventListener('keydown', onEscKeyDown);
   });
@@ -71,7 +71,7 @@ render(siteMainElement, new MenuView(films).getElement(), InsertPlace.BEFORE_END
 render(siteMainElement, new SiteSortView().getElement(), InsertPlace.BEFORE_END);
 
 render(siteMainElement, filmsContainer.getElement(), InsertPlace.BEFORE_END);
-if (films.length === 0) {
+if (!films.length) {
   render(filmsContainer.getElement(), new NoFilmsView().getElement(), InsertPlace.BEFORE_END);
 } else {
   render(filmsContainer.getElement(), nameFilmListElement.getElement(), InsertPlace.BEFORE_END);
@@ -84,8 +84,7 @@ if (films.length === 0) {
   if (films.length > COUNT_PER_STEP) {
     let renderedCount = COUNT_PER_STEP;
     render(nameFilmListElement.getElement(), showMoreButton.getElement(), InsertPlace.BEFORE_END);
-    showMoreButton.getElement().addEventListener('click', (evt) => {
-      evt.preventDefault();
+    showMoreButton.setClickHandler(() => {
       films
         .slice(renderedCount, renderedCount + COUNT_PER_STEP)
         .forEach((film) => renderFilm(filmListContainer.getElement(), film));

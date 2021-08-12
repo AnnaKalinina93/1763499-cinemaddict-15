@@ -1,4 +1,4 @@
-import { getRandomInteger, getRandomArrayElement} from '../utils/get-random.js';
+import { getRandomInteger, getRandomArrayElement} from '../utils/common.js';
 import { generateDate,  getTimeFormat, getDayMonthFormat } from '../day.js';
 
 const TEXT = [
