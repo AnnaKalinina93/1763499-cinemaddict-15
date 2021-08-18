@@ -214,7 +214,7 @@ export default class Popup extends AbstractView {
 
   setAlreadyWatchedClickHandler(callback){
     this._callback.alreadyWatchedClick = callback;
-    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._alreadyWatchedClick);
+    this.getElement().querySelector('.film-details__control-button--watched').addEventListener('click', this._alreadyWatchedClickHandler);
   }
 
   setClickHandler(callback) {

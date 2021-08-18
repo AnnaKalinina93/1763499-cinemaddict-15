@@ -11,8 +11,8 @@ export default class Film {
   constructor(filmListElement, changeData, changeMode) {
     this._filmListElement = filmListElement;
     this._changeData = changeData;
-    this._changeMode= changeMode;
-    this._filmComponen = null;
+    this._changeMode = changeMode;
+    this._filmComponent = null;
     this._popupComponent = null;
     this._siteBodyElement = document.querySelector('body');
     this._mode = Mode.DEFAULT;
@@ -29,7 +29,7 @@ export default class Film {
   init(film) {
     this._film = film;
 
-    const prevFilmComponent = this._filmComponen;
+    const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(film);
@@ -82,7 +82,10 @@ export default class Film {
         {},
         this._film,
         {
-          favorite: !this._film.favorite,
+          userDetails: {
+            ...this._film.userDetails,
+            favorite: !this._film.favorite,
+          },
         },
       ),
     );
@@ -94,7 +97,10 @@ export default class Film {
         {},
         this._film,
         {
-          watchlist: !this._film.watchlist,
+          userDetails: {
+            ...this._film.userDetails,
+            watchlist: !this._film.watchlist,
+          },
         },
       ),
     );
@@ -106,7 +112,10 @@ export default class Film {
         {},
         this._film,
         {
-          alreadyWatched: !this._film.alreadyWatched,
+          userDetails: {
+            ...this._film.userDetails,
+            alreadyWatched: !this._film.alreadyWatched,
+          },
         },
       ),
     );

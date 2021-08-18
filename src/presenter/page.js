@@ -6,6 +6,7 @@ import AdditionalContainerView from '../view/additional-container.js';
 import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
 import SiteSortView from '../view/sort.js';
+import MenuView from '../view/menu.js';
 import { render, InsertPlace, remove } from '../utils/render.js';
 import FilmPresenter from './film.js';
 import { updateItem } from '../utils/common.js';
@@ -13,7 +14,7 @@ const COUNT_PER_STEP = 5;
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
 
-export default class MovieList {
+export default class Page {
   constructor(siteElement) {
     this._siteElement = siteElement;
     this._renderedCount = COUNT_PER_STEP;
@@ -31,10 +32,16 @@ export default class MovieList {
 
   init(films) {
     this._films = films.slice();
+    this._renderMenu();
     this._renderSortFilms();
     render(this._siteElement, this._filmsContainer, InsertPlace.BEFORE_END);
     this._renderFilmList();
 
+  }
+
+  _renderMenu() {
+    const menuComponent = new MenuView(this._films);
+    render(this._siteElement, menuComponent, InsertPlace.BEFORE_END);
   }
 
   _renderSortFilms() {
@@ -47,7 +54,7 @@ export default class MovieList {
   }
 
   _renderFilm(filmListElement, film) {
-    const filmPresenter = new FilmPresenter(filmListElement,this._handleFilmChange, this._handleModeChange);
+    const filmPresenter = new FilmPresenter(filmListElement, this._handleFilmChange, this._handleModeChange);
     filmPresenter.init(film);
     this._filmPresenter.set(film.id, filmPresenter);
   }
