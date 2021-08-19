@@ -7,7 +7,7 @@ import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
 import SiteSortView from '../view/sort.js';
 import MenuView from '../view/menu.js';
-import { render, InsertPlace, remove } from '../utils/render.js';
+import { render, InsertPlace, remove, topSortFunction, commentedSortFunction } from '../utils/render.js';
 import FilmPresenter from './film.js';
 import { updateItem } from '../utils/common.js';
 const COUNT_PER_STEP = 5;
@@ -87,22 +87,13 @@ export default class Page {
     this._showMoreButton.setClickHandler(this._handleShowMoreButtonClick);
   }
 
-  _renderTopFilmList() {
-    const topAdditionalContainer = new AdditionalContainerView(TOP_NAME);
-    const topFilmListContainer = new FilmListContainerView();
-    render(this._filmsContainer, topAdditionalContainer, InsertPlace.BEFORE_END);
-    render(topAdditionalContainer, topFilmListContainer, InsertPlace.BEFORE_END);
-    const topFilms = [...this._films].sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
-    this._renderFilms(0, 2, topFilmListContainer, topFilms);
-  }
-
-  _renderCommentedFilmList() {
-    const commentedAdditionalContainer = new AdditionalContainerView(MOST_COMMENTED_NAME);
-    const commentedFilmListContainer = new FilmListContainerView();
-    render(this._filmsContainer, commentedAdditionalContainer, InsertPlace.BEFORE_END);
-    render(commentedAdditionalContainer, commentedFilmListContainer, InsertPlace.BEFORE_END);
-    const mostCommentedFilms = [...this._films].sort((a, b) => b.comments.length - a.comments.length);
-    this._renderFilms(0, 2, commentedFilmListContainer, mostCommentedFilms);
+  _renderAdditionalFilmList(listName, sortFunction, count = 2) {
+    const additionalContainer = new AdditionalContainerView(listName);
+    const filmListContainer = new FilmListContainerView();
+    render(this._filmsContainer, additionalContainer, InsertPlace.BEFORE_END);
+    render(additionalContainer, filmListContainer, InsertPlace.BEFORE_END);
+    const sortFilms = sortFunction(this._films);
+    this._renderFilms(0, count, filmListContainer, sortFilms);
   }
 
   _renderFooter() {
@@ -122,8 +113,8 @@ export default class Page {
       if (this._films.length > COUNT_PER_STEP) {
         this._renderShowMoreButton();
       }
-      this._renderTopFilmList();
-      this._renderCommentedFilmList();
+      this._renderAdditionalFilmList(TOP_NAME, topSortFunction);
+      this._renderAdditionalFilmList(MOST_COMMENTED_NAME, commentedSortFunction);
       this._renderFooter();
     }
 
