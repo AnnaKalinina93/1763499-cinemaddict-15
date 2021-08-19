@@ -55,9 +55,9 @@ export default class Film {
       replace(this._filmComponent, prevFilmComponent);
 
     }
-
-    if (this._filmListElement.getElement().contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
+    if (this._siteBodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
+      replace(this._filmComponent, prevFilmComponent);
     }
 
     remove(prevFilmComponent);
@@ -84,7 +84,7 @@ export default class Film {
         {
           userDetails: {
             ...this._film.userDetails,
-            favorite: !this._film.favorite,
+            favorite: !this._film.userDetails.favorite,
           },
         },
       ),
@@ -99,7 +99,7 @@ export default class Film {
         {
           userDetails: {
             ...this._film.userDetails,
-            watchlist: !this._film.watchlist,
+            watchlist: !this._film.userDetails.watchlist,
           },
         },
       ),
@@ -114,7 +114,7 @@ export default class Film {
         {
           userDetails: {
             ...this._film.userDetails,
-            alreadyWatched: !this._film.alreadyWatched,
+            alreadyWatched: !this._film.userDetails.alreadyWatched,
           },
         },
       ),
