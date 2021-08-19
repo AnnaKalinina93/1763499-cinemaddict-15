@@ -58,7 +58,11 @@ const replace = (newChild, oldChild) => {
 };
 const isEscape = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
 
-const topSortFunction = (films) => [...films].sort((a, b) => b.filmInfo.totalRating - a.filmInfo.totalRating);
-const commentedSortFunction = (films) => [...films].sort((a, b) => b.comments.length - a.comments.length);
-
-export { render, createElement, InsertPlace, remove, replace, isEscape, topSortFunction, commentedSortFunction};
+export {
+  render,
+  createElement,
+  InsertPlace,
+  remove,
+  replace,
+  isEscape
+};

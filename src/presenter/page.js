@@ -7,9 +7,11 @@ import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
 import SiteSortView from '../view/sort.js';
 import MenuView from '../view/menu.js';
-import { render, InsertPlace, remove, topSortFunction, commentedSortFunction } from '../utils/render.js';
+import { render, InsertPlace, remove} from '../utils/render.js';
+import {topSortFunction, commentedSortFunction, sortFilmRating, sortFilmDate} from '../utils/sort.js';
 import FilmPresenter from './film.js';
 import { updateItem } from '../utils/common.js';
+import { SortType } from '../const.js';
 const COUNT_PER_STEP = 5;
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
@@ -25,17 +27,21 @@ export default class Page {
     this._noFilmsComponent = new NoFilmsView();
     this._sortFilms = new SiteSortView();
     this._filmPresenter = new Map();
+    this._additionalFilmPresenter = new Map();
+    this._currentSortType = SortType.DEFAULT;
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
+    this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
   }
 
   init(films) {
     this._films = films.slice();
+    this._sourcedFilms = films.slice();
     this._renderMenu();
     this._renderSortFilms();
     render(this._siteElement, this._filmsContainer, InsertPlace.BEFORE_END);
-    this._renderFilmList();
+    this._renderPage();
 
   }
 
@@ -46,11 +52,40 @@ export default class Page {
 
   _renderSortFilms() {
     render(this._siteElement, this._sortFilms, InsertPlace.BEFORE_END);
+    this._sortFilms.setSortTypeChangeHandler(this._handleSortTypeChange);
+  }
+
+  _handleSortTypeChange(sortType) {
+    if (this._currentSortType === sortType) {
+      return;
+    }
+
+    this._sortFilmsList(sortType);
+    this._clearFilmList();
+    this._renderFilmList();
+  }
+
+  _sortFilmsList(sortType) {
+
+    switch (sortType) {
+      case SortType.DATE:
+        this._films.sort(sortFilmDate);
+        break;
+      case SortType.RATING:
+        this._films.sort(sortFilmRating);
+        break;
+      default:
+        this._films = this._sourcedFilms.slice();
+    }
+
+    this._currentSortType = sortType;
   }
 
   _handleFilmChange(updatedTask) {
     this._films = updateItem(this._films, updatedTask);
+    this._sourcedFilms = updateItem(this._sourcedFilms, updatedTask);
     this._filmPresenter.get(updatedTask.id).init(updatedTask);
+    this._additionalFilmPresenter.get(updatedTask.id).init(updatedTask);
   }
 
   _renderFilm(filmListElement, film) {
@@ -59,10 +94,22 @@ export default class Page {
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
+  _renderAdditionalFilm(filmListElement, film) {
+    const additionalFilmPresenter = new FilmPresenter(filmListElement, this._handleFilmChange, this._handleModeChange);
+    additionalFilmPresenter.init(film);
+    this._additionalFilmPresenter.set(film.id, additionalFilmPresenter);
+  }
+
   _renderFilms(from, to, siteElement, films) {
     films
       .slice(from, to)
       .forEach((film) => this._renderFilm(siteElement, film));
+  }
+
+  _renderAdditionalFilms(from, to, siteElement, films) {
+    films
+      .slice(from, to)
+      .forEach((film) => this._renderAdditionalFilm(siteElement, film));
   }
 
   _renderNoFilm() {
@@ -93,7 +140,7 @@ export default class Page {
     render(this._filmsContainer, additionalContainer, InsertPlace.BEFORE_END);
     render(additionalContainer, filmListContainer, InsertPlace.BEFORE_END);
     const sortFilms = sortFunction(this._films);
-    this._renderFilms(0, count, filmListContainer, sortFilms);
+    this._renderAdditionalFilms(0, count, filmListContainer, sortFilms);
   }
 
   _renderFooter() {
@@ -104,15 +151,19 @@ export default class Page {
   }
 
   _renderFilmList() {
+    this._renderFilms(0, Math.min(this._films.length, COUNT_PER_STEP), this._filmListContainer, this._films);
+    if (this._films.length > COUNT_PER_STEP) {
+      this._renderShowMoreButton();
+    }
+  }
+
+  _renderPage() {
     if (!this._films.length) {
       this._renderNoFilm();
     } else {
       render(this._filmsContainer, this._nameFilmListElement, InsertPlace.BEFORE_END);
       render(this._nameFilmListElement, this._filmListContainer, InsertPlace.BEFORE_END);
-      this._renderFilms(0, Math.min(this._films.length, COUNT_PER_STEP), this._filmListContainer, this._films);
-      if (this._films.length > COUNT_PER_STEP) {
-        this._renderShowMoreButton();
-      }
+      this._renderFilmList();
       this._renderAdditionalFilmList(TOP_NAME, topSortFunction);
       this._renderAdditionalFilmList(MOST_COMMENTED_NAME, commentedSortFunction);
       this._renderFooter();
