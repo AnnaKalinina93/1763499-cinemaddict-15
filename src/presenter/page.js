@@ -7,11 +7,12 @@ import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
 import SiteSortView from '../view/sort.js';
 import MenuView from '../view/menu.js';
-import { render, InsertPlace, remove } from '../utils/render.js';
+import { render, InsertPlace, remove , replace} from '../utils/render.js';
 import { topSortFunction, commentedSortFunction, sortFilmRating, sortFilmDate } from '../utils/sort.js';
 import FilmPresenter from './film.js';
 import { updateItem } from '../utils/common.js';
 import { SortType } from '../const.js';
+
 const COUNT_PER_STEP = 5;
 const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
@@ -25,11 +26,12 @@ export default class Page {
     this._filmListContainer = new FilmListContainerView;
     this._showMoreButton = new ButtonView();
     this._noFilmsComponent = new NoFilmsView();
-    this._sortFilms = new SiteSortView();
+    this._currentSortType = SortType.DEFAULT;
+    this._sortFilms = new SiteSortView(this._currentSortType);
     this._filmPresenter = new Map();
     this._topFilmPresenter = new Map();
     this._commentedFilmPresenter = new Map();
-    this._currentSortType = SortType.DEFAULT;
+
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleFilmChange = this._handleFilmChange.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
@@ -51,6 +53,13 @@ export default class Page {
     render(this._siteElement, menuComponent, InsertPlace.BEFORE_END);
   }
 
+  _rerenderSortFilms(sortType) {
+    const newSortView = new SiteSortView(sortType);
+    newSortView.setSortTypeChangeHandler(this._handleSortTypeChange);
+    replace(newSortView.getElement(), this._sortFilms);
+    this._sortFilms = newSortView;
+  }
+
   _renderSortFilms() {
     render(this._siteElement, this._sortFilms, InsertPlace.BEFORE_END);
     this._sortFilms.setSortTypeChangeHandler(this._handleSortTypeChange);
@@ -61,6 +70,7 @@ export default class Page {
       return;
     }
 
+    this._rerenderSortFilms(sortType);
     this._sortFilmsList(sortType);
     this._clearFilmList();
     this._renderFilmList();
