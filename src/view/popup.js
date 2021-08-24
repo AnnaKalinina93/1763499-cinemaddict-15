@@ -237,6 +237,7 @@ export default class Popup extends SmartView {
     this._callback.click = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
+  // парсим входные данные
 
   static parseFilmToData(film) {
     return Object.assign(
@@ -247,6 +248,7 @@ export default class Popup extends SmartView {
       },
     );
   }
+
 
   static parseDataToFilm(data) {
 
@@ -262,11 +264,14 @@ export default class Popup extends SmartView {
     return data;
   }
 
+
   _setInnerHandlers() {
     this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emojiHandler);
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._textInputHandler);
     document.addEventListener('keydown', this._sendCommentHandler);
   }
+
+  // обрабатывает инпут текстари , не перерисовывая его , но обновляя данные ( добавляем newComment)
 
   _textInputHandler(evt) {
     evt.preventDefault();
@@ -285,6 +290,8 @@ export default class Popup extends SmartView {
     this.getElement().scrollTop = this._data.scrollPosition;
   }
 
+  // обрабатваем чекбоксы с эмоджи, перерисовывая сразу всю страницу, чтобы в диве появлялся выбранный смайл
+
   _emojiHandler(evt) {
     evt.preventDefault();
     this.updateData(
@@ -302,9 +309,13 @@ export default class Popup extends SmartView {
     this.getElement().scrollTop = this._data.scrollPosition;
   }
 
+  // отправка комментария
+
   _sendCommentHandler(evt) {
     if (evt.ctrlKey && evt.key === 'Enter') {
       if (this._data.newComment.emoji || this._data.newComment.text) {
+        // если есть обнавленные данные , то новый комментарий добавляем в конец массива
+        //и парсим в обратную сторону и заодно перерисовываем попап
         this._addingNewCooment();
         this.getElement().scrollTop = this._data.scrollPosition;
         this._data = Popup.parseDataToFilm(this._data);
@@ -312,6 +323,7 @@ export default class Popup extends SmartView {
       }
     }
   }
+  // пушим новый комментарий в конец массива комментариев
 
   _addingNewCooment() {
     this._data.comments.push(this._data.newComment);
