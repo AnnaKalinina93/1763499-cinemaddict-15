@@ -1,6 +1,7 @@
-import { getDayMonthFormat, getYearsFormat } from '../day.js';
+import { getDayMonthFormat, getYearsFormat, getTimeFormat } from '../day.js';
 import SmartView from './smart.js';
 import { transformTime } from '../utils/time-format';
+import dayjs from 'dayjs';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
@@ -30,10 +31,10 @@ const createEmojiTemplate = (newComment) => (
 
 const createNewCommentTemplate = (newComment) => (
   ` <div class="film-details__new-comment">
-  <div class="film-details__add-emoji-label">${newComment ? createEmojiTemplate(newComment) : ''}</div>
+  <div class="film-details__add-emoji-label">${newComment.emoji ? createEmojiTemplate(newComment) : ''}</div>
 
   <label class="film-details__comment-label">
-    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment ? newComment.text : ''}</textarea>
+    <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${newComment.text ? newComment.text : ''}</textarea>
   </label>
 
   <div class="film-details__emoji-list">
@@ -59,10 +60,9 @@ const createNewCommentTemplate = (newComment) => (
   </div>`
 );
 
-const createPopupTemplate = (data) => {
+const createPopupTemplate = (data, newComment) => {
   const {
     comments,
-    newComment,
     isComments,
     filmInfo: {
       title,
@@ -195,7 +195,7 @@ export default class Popup extends SmartView {
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data);
+    return createPopupTemplate(this._data, this._newComment);
   }
 
   _clickHandler(evt) {
@@ -244,6 +244,7 @@ export default class Popup extends SmartView {
       {},
       film,
       {
+        scrollPosition: null,
         isComments: film.comments.length !== 0,
       },
     );
@@ -257,10 +258,11 @@ export default class Popup extends SmartView {
     if (!data.isComments) {
       data.comments = [];
     }
-    if (!data.newComment) {
-      delete data.newComment;
+    if (data.scrollPosition) {
+      delete data.scrollPosition;
     }
     delete data.isComments;
+
     return data;
   }
 
@@ -275,16 +277,21 @@ export default class Popup extends SmartView {
 
   _textInputHandler(evt) {
     evt.preventDefault();
-    this.updateData(
+    this._data = Object.assign(
+      {},
+      this._data,
+      {
+        isComments: this._data.comments.length !== 0,
+        scrollPosition: this.getElement().scrollTop,
+      },
+    );
+
+    this.updateNewComment(
       Object.assign(
         {},
-        this._data,
+        this._newComment,
         {
-          scrollPosition: this.getElement().scrollTop,
-          newComment: {
-            ...this._data.newComment,
-            text: evt.target.value,
-          },
+          text: evt.target.value,
         },
       ), true);
     this.getElement().scrollTop = this._data.scrollPosition;
@@ -294,16 +301,20 @@ export default class Popup extends SmartView {
 
   _emojiHandler(evt) {
     evt.preventDefault();
-    this.updateData(
+    this._data = Object.assign(
+      {},
+      this._data,
+      {
+        isComments: this._data.comments.length !== 0,
+        scrollPosition: this.getElement().scrollTop,
+      },
+    );
+    this.updateNewComment(
       Object.assign(
         {},
-        this._data,
+        this._newComment,
         {
-          scrollPosition: this.getElement().scrollTop,
-          newComment: {
-            ...this._data.newComment,
-            emoji: `images/emoji/${evt.target.value}.png`,
-          },
+          emoji: `images/emoji/${evt.target.value}.png`,
         },
       ));
     this.getElement().scrollTop = this._data.scrollPosition;
@@ -313,21 +324,51 @@ export default class Popup extends SmartView {
 
   _sendCommentHandler(evt) {
     if (evt.ctrlKey && evt.key === 'Enter') {
-      if (this._data.newComment.emoji || this._data.newComment.text) {
+      evt.preventDefault();
+      if (this._newComment.emoji || this._newComment.text) {
         // если есть обнавленные данные , то новый комментарий добавляем в конец массива
         //и парсим в обратную сторону и заодно перерисовываем попап
         this._addingNewCooment();
+        this.updateData(
+          Object.assign(
+            {},
+            this._data,
+            {
+              isComments: this._data.comments.length !== 0,
+              scrollPosition: this.getElement().scrollTop,
+            },
+          ),
+        );
         this.getElement().scrollTop = this._data.scrollPosition;
+
         this._data = Popup.parseDataToFilm(this._data);
-        this.updateElement();
+
       }
     }
   }
   // пушим новый комментарий в конец массива комментариев
 
   _addingNewCooment() {
-    this._data.comments.push(this._data.newComment);
-    this._data = Object.assign({}, this._data);
+    const dueDate = dayjs();
+    this._newComment = Object.assign(
+      {},
+      this._newComment,
+      {
+        id: 1,
+        avtor: 'Anna',
+        dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
+      });
+    const comments = this._data.comments;
+    const newcomment = this._newComment;
+    comments[comments.length] = newcomment;
+    this._data = Object.assign(
+      {},
+      this._data,
+      {
+        comments: comments,
+      },
+    );
+    this._newComment = {};
   }
 
   restoreHandlers() {

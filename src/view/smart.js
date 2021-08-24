@@ -4,6 +4,26 @@ export default class Smart extends Abstract {
   constructor() {
     super();
     this._data = {};
+    this._newComment = {};
+  }
+
+
+  updateNewComment(update, justDataUpdating) {
+    if (!update) {
+      return;
+    }
+
+    this._newComment = Object.assign(
+      {},
+      this._newComment,
+      update,
+    );
+
+    if (justDataUpdating) {
+      return;
+    }
+
+    this.updateElement();
   }
 
 
