@@ -57,6 +57,7 @@ export default class Film {
     }
     if (this._siteBodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
+      this._siteBodyElement.classList.add('hide-overflow');
       replace(this._filmComponent, prevFilmComponent);
     }
 
