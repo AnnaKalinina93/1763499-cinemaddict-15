@@ -180,9 +180,10 @@ const createPopupTemplate = (data, newComment) => {
 </section>`;
 };
 export default class Popup extends SmartView {
-  constructor(film) {
+  constructor(film, changeData) {
     super();
     this._data = Popup.parseFilmToData(film);
+    this._changeData = changeData;
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
@@ -369,6 +370,7 @@ export default class Popup extends SmartView {
       },
     );
     this._newComment = {};
+    this._changeData(this._data);
   }
 
   restoreHandlers() {

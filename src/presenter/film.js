@@ -33,7 +33,7 @@ export default class Film {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film);
+    this._popupComponent = new PopupView(film, this._changeData);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);
@@ -57,7 +57,6 @@ export default class Film {
     }
     if (this._siteBodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
-      this._siteBodyElement.classList.add('hide-overflow');
       replace(this._filmComponent, prevFilmComponent);
     }
 
