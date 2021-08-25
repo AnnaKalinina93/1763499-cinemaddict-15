@@ -1,5 +1,5 @@
 import { getYearsFormat } from '../day';
-import { transformTime } from '../utils/time-format';
+import { generateRuntime } from '../day.js';
 import AbstractView from './abstract';
 
 const createFilmTemplate = (film) => {
@@ -37,7 +37,7 @@ const createFilmTemplate = (film) => {
         <p class="film-card__rating">${totalRating}</p>
         <p class="film-card__info">
           <span class="film-card__year">${getYearsFormat(date)}</span>
-          <span class="film-card__duration">${transformTime(runTime)}</span>
+          <span class="film-card__duration">${generateRuntime(runTime)}</span>
           <span class="film-card__genre">${genres.slice(0, 1)}</span>
         </p>
         <img src=${poster} alt="" class="film-card__poster">

@@ -1,6 +1,6 @@
 import { getDayMonthFormat, getYearsFormat, getTimeFormat } from '../day.js';
 import SmartView from './smart.js';
-import { transformTime } from '../utils/time-format';
+import { generateRuntime } from '../day.js';
 import dayjs from 'dayjs';
 
 const createCommentTemplate = (comment) => (
@@ -144,7 +144,7 @@ const createPopupTemplate = (data, newComment) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${transformTime(runTime)}</td>
+              <td class="film-details__cell">${generateRuntime(runTime)}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
@@ -183,6 +183,7 @@ export default class Popup extends SmartView {
   constructor(film, changeData) {
     super();
     this._data = Popup.parseFilmToData(film);
+    this._newComment = {};
     this._changeData = changeData;
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
@@ -267,6 +268,23 @@ export default class Popup extends SmartView {
     return data;
   }
 
+  _updateNewComment(update, justDataUpdating) {
+    if (!update) {
+      return;
+    }
+
+    this._newComment = Object.assign(
+      {},
+      this._newComment,
+      update,
+    );
+
+    if (justDataUpdating) {
+      return;
+    }
+
+    this.updateElement();
+  }
 
   _setInnerHandlers() {
     this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emojiHandler);
@@ -278,16 +296,17 @@ export default class Popup extends SmartView {
 
   _textInputHandler(evt) {
     evt.preventDefault();
-    this._data = Object.assign(
-      {},
-      this._data,
-      {
-        isComments: this._data.comments.length !== 0,
-        scrollPosition: this.getElement().scrollTop,
-      },
-    );
+    this.updateData(
+      Object.assign(
+        {},
+        this._data,
+        {
+          isComments: this._data.comments.length !== 0,
+          scrollPosition: this.getElement().scrollTop,
+        },
+      ), true);
 
-    this.updateNewComment(
+    this._updateNewComment(
       Object.assign(
         {},
         this._newComment,
@@ -302,15 +321,16 @@ export default class Popup extends SmartView {
 
   _emojiHandler(evt) {
     evt.preventDefault();
-    this._data = Object.assign(
-      {},
-      this._data,
-      {
-        isComments: this._data.comments.length !== 0,
-        scrollPosition: this.getElement().scrollTop,
-      },
-    );
-    this.updateNewComment(
+    this.updateData(
+      Object.assign(
+        {},
+        this._data,
+        {
+          isComments: this._data.comments.length !== 0,
+          scrollPosition: this.getElement().scrollTop,
+        },
+      ), true);
+    this._updateNewComment(
       Object.assign(
         {},
         this._newComment,
@@ -343,7 +363,7 @@ export default class Popup extends SmartView {
         this.getElement().scrollTop = this._data.scrollPosition;
 
         this._data = Popup.parseDataToFilm(this._data);
-
+        this._changeData(this._data);
       }
     }
   }
@@ -351,26 +371,28 @@ export default class Popup extends SmartView {
 
   _addingNewCooment() {
     const dueDate = dayjs();
-    this._newComment = Object.assign(
-      {},
-      this._newComment,
-      {
-        id: 1,
-        avtor: 'Anna',
-        dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
-      });
+    this._updateNewComment(
+      Object.assign(
+        {},
+        this._newComment,
+        {
+          id: 1,
+          avtor: 'Anna',
+          dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
+        },
+      ), true);
     const comments = this._data.comments;
     const newcomment = this._newComment;
     comments[comments.length] = newcomment;
-    this._data = Object.assign(
+    this.updateData(Object.assign(
       {},
       this._data,
       {
         comments: comments,
       },
-    );
+    ), true);
     this._newComment = {};
-    this._changeData(this._data);
+
   }
 
   restoreHandlers() {

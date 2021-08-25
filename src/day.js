@@ -1,5 +1,7 @@
 import dayjs from 'dayjs';
 import { getRandomInteger } from './utils/common.js';
+import duration from 'dayjs/plugin/duration';
+dayjs.extend(duration);
 
 const generateDate = () => {
   const maxDaysGap = 7;
@@ -11,4 +13,12 @@ const generateDate = () => {
 const getDayMonthFormat = (dueDate) => dayjs(dueDate).format('D MMMM');
 const getYearsFormat = (dueDate) => dayjs(dueDate).format('YYYY');
 const getTimeFormat = (dueDate) => dayjs(dueDate).format('HH:MM');
-export {generateDate, getDayMonthFormat, getYearsFormat , getTimeFormat};
+const generateRuntime = (time) => {
+  const hour = dayjs.duration(time, 'm').format('H');
+  const minute = dayjs.duration(time, 'm').format('mm');
+  if (time < 60) {
+    return `${minute}m`;
+  }
+  return `${hour}h ${minute}m`;
+};
+export {generateDate, getDayMonthFormat, getYearsFormat , getTimeFormat, generateRuntime};
