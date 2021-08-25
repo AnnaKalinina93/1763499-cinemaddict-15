@@ -137,7 +137,7 @@ export default class Page {
   }
 
   _handleShowMoreButtonClick() {
-    this._renderFilms(this._renderedCount, this._renderedCount + COUNT_PER_STEP, this._filmListContainer, this._films);
+    this._renderFilms(this._renderedCount, this._renderedCount + COUNT_PER_STEP, this._filmListContainer, this._films, this._renderFilm);
     this._renderedCount += COUNT_PER_STEP;
 
     if (this._renderedCount >= this._films.length) {
@@ -198,6 +198,5 @@ export default class Page {
     this._renderedCount = COUNT_PER_STEP;
     remove(this._showMoreButton);
   }
-
 
 }

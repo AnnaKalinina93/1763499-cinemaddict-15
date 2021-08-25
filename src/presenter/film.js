@@ -33,7 +33,7 @@ export default class Film {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film);
+    this._popupComponent = new PopupView(film, this._changeData);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);

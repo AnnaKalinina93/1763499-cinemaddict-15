@@ -66,7 +66,7 @@ const COUNTRIES = [
 let currentId = 1;
 
 const generateData = () => {
-  const COUNT = getRandomInteger(1, 5);
+  const COUNT = getRandomInteger(0, 5);
   const comments = new Array(COUNT).fill().map(getComments);
   const title = getRandomArrayElement(TITLES);
   const date = generateDate();
