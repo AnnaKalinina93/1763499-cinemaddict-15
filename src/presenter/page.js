@@ -109,6 +109,7 @@ export default class Page {
       case UserAction.ADD_COMMENTS:
         // сейчас не правильно добавляется комментарий ,
         //он просто добавляется в конец всего массива в виде объекта,(а не в конкретный массив внутри массива)
+        //надо мне настроить модель комментариев для одного фильма и можно будет воспользоваться этой же логикой
         // this._commentsModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENTS:
@@ -270,9 +271,7 @@ export default class Page {
     if (resetRenderedFilmsCount) {
       this._renderedCount = COUNT_PER_STEP;
     } else {
-      // На случай, если перерисовка доски вызвана
-      // уменьшением количества задач (например, удаление или перенос в архив)
-      // нужно скорректировать число показанных задач
+
       this._renderedCount = Math.min(filmsCount, this._renderedCount);
     }
 

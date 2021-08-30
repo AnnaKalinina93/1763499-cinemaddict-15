@@ -13,6 +13,7 @@ export default class Comments extends AbstractObserver {
   getComments() {
     return this._comments;
   }
+  // модель пока возвращает массив из массивов комментариев
 
   // getCommentsFilm(film, count) {
   //   return this._comments[count];

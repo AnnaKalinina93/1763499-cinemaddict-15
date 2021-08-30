@@ -183,12 +183,14 @@ const createPopupTemplate = (data, newComment, correctComments) => {
 </section>`;
 };
 export default class Popup extends SmartView {
-  constructor(film, changeData, comments) {
+  constructor(film, changeData, comments, scroll, saveScroll) {
     super();
     this._comments = comments;
+    this._scrollPosition = scroll;
     this._data = Popup.parseFilmToData(film);
     this._newComment = {};
     this._changeData = changeData;
+    this._saveScroll = saveScroll;
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
@@ -211,17 +213,23 @@ export default class Popup extends SmartView {
   }
 
   _favoriteClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop,
     evt.preventDefault();
+    this._saveScroll(this._scrollPosition);
     this._callback.favoriteClick();
   }
 
   _watchlistClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop,
     evt.preventDefault();
+    this._saveScroll(this._scrollPosition);
     this._callback.watchlistClick();
   }
 
   _alreadyWatchedClickHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop,
     evt.preventDefault();
+    this._saveScroll(this._scrollPosition);
     this._callback.alreadyWatchedClick();
   }
 
@@ -252,7 +260,6 @@ export default class Popup extends SmartView {
       {},
       film,
       {
-        scrollPosition: null,
         isComments: film.comments.length !== 0,
       },
     );
@@ -266,9 +273,7 @@ export default class Popup extends SmartView {
     if (!data.isComments) {
       data.comments = [];
     }
-    if (data.scrollPosition) {
-      delete data.scrollPosition;
-    }
+
     delete data.isComments;
 
     return data;
@@ -310,7 +315,6 @@ export default class Popup extends SmartView {
         this._data,
         {
           isComments: this._data.comments.length !== 0,
-          scrollPosition: this.getElement().scrollTop,
         },
       ), true);
 
@@ -322,12 +326,13 @@ export default class Popup extends SmartView {
           text: evt.target.value,
         },
       ), true);
-    this.getElement().scrollTop = this._data.scrollPosition;
+
   }
 
   // обрабатваем чекбоксы с эмоджи, перерисовывая сразу всю страницу, чтобы в диве появлялся выбранный смайл
 
   _emojiHandler(evt) {
+    this._scrollPosition = this.getElement().scrollTop,
     evt.preventDefault();
     this.updateData(
       Object.assign(
@@ -335,7 +340,6 @@ export default class Popup extends SmartView {
         this._data,
         {
           isComments: this._data.comments.length !== 0,
-          scrollPosition: this.getElement().scrollTop,
         },
       ), true);
     this._updateNewComment(
@@ -346,7 +350,7 @@ export default class Popup extends SmartView {
           emoji: `images/emoji/${evt.target.value}.png`,
         },
       ));
-    this.getElement().scrollTop = this._data.scrollPosition;
+    this.getElement().scrollTop = this._scrollPosition;
   }
 
   // отправка комментария
@@ -357,6 +361,7 @@ export default class Popup extends SmartView {
       if (this._newComment.emoji || this._newComment.text) {
         // если есть обнавленные данные , то новый комментарий добавляем в конец массива
         //и парсим в обратную сторону и заодно перерисовываем попап
+        this._scrollPosition = this.getElement().scrollTop;
         this._addingNewCooment();
         this.updateData(
           Object.assign(
@@ -364,21 +369,20 @@ export default class Popup extends SmartView {
             this._data,
             {
               isComments: this._data.comments.length !== 0,
-              scrollPosition: this.getElement().scrollTop,
             },
           ),
         );
-        this.getElement().scrollTop = this._data.scrollPosition;
-
         this._data = Popup.parseDataToFilm(this._data);
+        this._saveScroll(this._scrollPosition);
         this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
-        this.getElement().scrollTop = this._data.scrollPosition;
+        this._saveScroll(this._scrollPosition);
       }
     }
   }
   // пушим новый комментарий в конец массива комментариев
 
   _addingNewCooment() {
+    //если бы быда подключена модель комментариев к одному фильму, то можно было бы делать через нее
     const dueDate = dayjs();
     this._updateNewComment(
       Object.assign(
@@ -412,6 +416,8 @@ export default class Popup extends SmartView {
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
+    // если бы была модель можно было бы удалить через ее метод
+    this._scrollPosition = this.getElement().scrollTop;
     this._comments.forEach((comment) => {
       if (comment.id === evt.target.id) {
         this._comments = this._delete(this._comments, comment);
@@ -427,7 +433,7 @@ export default class Popup extends SmartView {
     ), true);
     this._data = Popup.parseDataToFilm(this._data);
     this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
-
+    this._saveScroll(this._scrollPosition);
   }
 
   _delete(comments, update) {

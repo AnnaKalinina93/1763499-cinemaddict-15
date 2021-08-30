@@ -1,7 +1,7 @@
 import { render, InsertPlace, remove, replace, isEscape } from '../utils/render.js';
 import FilmView from '../view/film.js';
 import PopupView from '../view/popup.js';
-import {UserAction, UpdateType, Mode, FilterType} from '../const.js';
+import { UserAction, UpdateType, Mode, FilterType } from '../const.js';
 
 
 export default class Film {
@@ -14,6 +14,7 @@ export default class Film {
     this._siteBodyElement = document.querySelector('body');
     this._mode = Mode.DEFAULT;
     this._filterType = filterType;
+    this._scrollPosition = null;
 
     this._handleOpenClick = this._handleOpenClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
@@ -32,7 +33,7 @@ export default class Film {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film, this._changeData, this._comments);
+    this._popupComponent = new PopupView(film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);
@@ -58,6 +59,7 @@ export default class Film {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
       this._siteBodyElement.classList.add('hide-overflow');
+      this._siteBodyElement.scrollTop = this._scrollPosition;
     }
 
     remove(prevFilmComponent);
@@ -79,7 +81,7 @@ export default class Film {
   _handleFavoriteClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      this._filterType !== FilterType.FAVORITES? UpdateType.PATCH : UpdateType.MINOR,
+      this._filterType !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -91,12 +93,13 @@ export default class Film {
         },
       ), this._comments,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleWatchlistClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      this._filterType !== FilterType.WATCHLIST? UpdateType.PATCH : UpdateType.MINOR,
+      this._filterType !== FilterType.WATCHLIST ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -108,12 +111,13 @@ export default class Film {
         },
       ), this._comments,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleAlreadyWatchedClick() {
     this._changeData(
       UserAction.UPDATE_FILM,
-      this._filterType !== FilterType.HISTORY? UpdateType.PATCH : UpdateType.MINOR,
+      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -125,6 +129,7 @@ export default class Film {
         },
       ), this._comments,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleOpenClick() {
@@ -169,6 +174,11 @@ export default class Film {
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+  }
+  // пыталась записать таким способом данные скролла, он добавляется, но на следующем шаге сбрасывается
+
+  _saveScroll(scrollPosition) {
+    this._scrollPosition = scrollPosition;
   }
 
 }
