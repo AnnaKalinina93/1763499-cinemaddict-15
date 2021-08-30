@@ -4,6 +4,7 @@ import { generateRuntime } from '../day.js';
 import dayjs from 'dayjs';
 import { UpdateType, UserAction } from '../const.js';
 import { nanoid } from 'nanoid';
+import he from 'he';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
@@ -11,7 +12,7 @@ const createCommentTemplate = (comment) => (
             <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
           </span>
           <div>
-            <p class="film-details__comment-text">${comment.text}</p>
+            <p class="film-details__comment-text">${he.encode(comment.text)}</p>
             <p class="film-details__comment-info" >
               <span class="film-details__comment-author">${comment.avtor}</span>
               <span class="film-details__comment-day">${comment.dueDate}</span>
