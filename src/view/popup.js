@@ -2,6 +2,7 @@ import { getDayMonthFormat, getYearsFormat, getTimeFormat } from '../day.js';
 import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
 import dayjs from 'dayjs';
+import { UpdateType, UserAction } from '../const.js';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
@@ -363,7 +364,7 @@ export default class Popup extends SmartView {
         this.getElement().scrollTop = this._data.scrollPosition;
 
         this._data = Popup.parseDataToFilm(this._data);
-        this._changeData(this._data);
+        this._changeData( UserAction.UPDATE_FILM, UpdateType.PATCH,this._data);
       }
     }
   }
