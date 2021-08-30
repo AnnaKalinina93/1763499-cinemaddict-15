@@ -3,6 +3,7 @@ import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
 import dayjs from 'dayjs';
 import { UpdateType, UserAction } from '../const.js';
+import { nanoid } from 'nanoid';
 
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
@@ -14,7 +15,7 @@ const createCommentTemplate = (comment) => (
             <p class="film-details__comment-info" >
               <span class="film-details__comment-author">${comment.avtor}</span>
               <span class="film-details__comment-day">${comment.dueDate}</span>
-              <button class="film-details__comment-delete">Delete</button>
+              <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
             </p>
           </div>
         </li>`
@@ -61,7 +62,7 @@ const createNewCommentTemplate = (newComment) => (
   </div>`
 );
 
-const createPopupTemplate = (data, newComment) => {
+const createPopupTemplate = (data, newComment, correctComments) => {
   const {
     comments,
     isComments,
@@ -173,7 +174,7 @@ const createPopupTemplate = (data, newComment) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-      ${isComments ? createCommentsTemplate(comments) : ''}
+      ${isComments ? createCommentsTemplate(correctComments) : ''}
       ${createNewCommentTemplate(newComment)}
       </section>
     </div>
@@ -181,8 +182,9 @@ const createPopupTemplate = (data, newComment) => {
 </section>`;
 };
 export default class Popup extends SmartView {
-  constructor(film, changeData) {
+  constructor(film, changeData, comments) {
     super();
+    this._comments = comments;
     this._data = Popup.parseFilmToData(film);
     this._newComment = {};
     this._changeData = changeData;
@@ -193,16 +195,17 @@ export default class Popup extends SmartView {
     this._textInputHandler = this._textInputHandler.bind(this);
     this._emojiHandler = this._emojiHandler.bind(this);
     this._sendCommentHandler = this._sendCommentHandler.bind(this);
-
+    this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
     this._setInnerHandlers();
   }
 
   getTemplate() {
-    return createPopupTemplate(this._data, this._newComment);
+    return createPopupTemplate(this._data, this._newComment, this._comments);
   }
 
   _clickHandler(evt) {
     evt.preventDefault();
+    this._newComment = {};
     this._callback.click();
   }
 
@@ -240,6 +243,7 @@ export default class Popup extends SmartView {
     this._callback.click = callback;
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
+
   // парсим входные данные
 
   static parseFilmToData(film) {
@@ -291,6 +295,8 @@ export default class Popup extends SmartView {
     this.getElement().querySelector('.film-details__emoji-list').addEventListener('change', this._emojiHandler);
     this.getElement().querySelector('.film-details__comment-input').addEventListener('input', this._textInputHandler);
     document.addEventListener('keydown', this._sendCommentHandler);
+    const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
+    Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
   }
 
   // обрабатывает инпут текстари , не перерисовывая его , но обновляя данные ( добавляем newComment)
@@ -364,7 +370,8 @@ export default class Popup extends SmartView {
         this.getElement().scrollTop = this._data.scrollPosition;
 
         this._data = Popup.parseDataToFilm(this._data);
-        this._changeData( UserAction.UPDATE_FILM, UpdateType.PATCH,this._data);
+        this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
+        this.getElement().scrollTop = this._data.scrollPosition;
       }
     }
   }
@@ -377,14 +384,18 @@ export default class Popup extends SmartView {
         {},
         this._newComment,
         {
-          id: 1,
+          id: nanoid(),
           avtor: 'Anna',
           dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
         },
       ), true);
+
     const comments = this._data.comments;
     const newcomment = this._newComment;
-    comments[comments.length] = newcomment;
+    const correctComments = this._comments;
+    correctComments[correctComments.length] = newcomment;
+    this._comments = correctComments;
+    comments[comments.length] = newcomment.id;
     this.updateData(Object.assign(
       {},
       this._data,
@@ -392,8 +403,38 @@ export default class Popup extends SmartView {
         comments: comments,
       },
     ), true);
+
     this._newComment = {};
 
+  }
+  // удаляем комментарии
+
+  _deleteCommentHandlers(evt) {
+    evt.preventDefault();
+    this._comments.forEach((comment) => {
+      if (comment.id === evt.target.id) {
+        this._comments = this._delete(this._comments, comment);
+      }
+    });
+    const comments = this._delete(this._data.comments, evt.target.id);
+    this.updateData(Object.assign(
+      {},
+      this._data,
+      {
+        comments: comments,
+      },
+    ), true);
+    this._data = Popup.parseDataToFilm(this._data);
+    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
+
+  }
+
+  _delete(comments, update) {
+    const index = comments.findIndex((comment) => comment.id === update.id);
+    return [
+      ...comments.slice(0, index),
+      ...comments.slice(index + 1),
+    ];
   }
 
   restoreHandlers() {

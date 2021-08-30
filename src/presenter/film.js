@@ -24,14 +24,15 @@ export default class Film {
 
   }
 
-  init(film) {
+  init(film, comment) {
     this._film = film;
+    this._comments = comment;
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film, this._changeData);
+    this._popupComponent = new PopupView(film, this._changeData, this._comments);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);
@@ -88,7 +89,7 @@ export default class Film {
             favorite: !this._film.userDetails.favorite,
           },
         },
-      ),
+      ), this._comments,
     );
   }
 
@@ -105,7 +106,7 @@ export default class Film {
             watchlist: !this._film.userDetails.watchlist,
           },
         },
-      ),
+      ), this._comments,
     );
   }
 
@@ -122,7 +123,7 @@ export default class Film {
             alreadyWatched: !this._film.userDetails.alreadyWatched,
           },
         },
-      ),
+      ), this._comments,
     );
   }
 
@@ -138,11 +139,9 @@ export default class Film {
   }
 
   _openPopupFilm() {
-    /*нужно придумать другой метод по закрытию предыдущего попапа
-    if (this._popupComponent) {
-      remove(this._popupComponent);
-      this._restoreHandlers();
-    }*/
+    if (document.querySelector('.film-details')) {
+      document.querySelector('.film-details').remove();
+    }
     render(this._siteBodyElement, this._popupComponent, InsertPlace.BEFORE_END);
 
     this._mode = Mode.POPUP;

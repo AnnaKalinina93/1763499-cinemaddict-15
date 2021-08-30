@@ -17,9 +17,11 @@ const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
 
 export default class Page {
-  constructor(siteElement, filmsModel, filterModel) {
+  constructor(siteElement, filmsModel, filterModel, commentsModel) {
     this._siteElement = siteElement;
     this._filmsModel = filmsModel;
+    this._commentsModel = commentsModel;
+    this._comments = null;
     this._renderedCount = COUNT_PER_STEP;
     this._filmsContainer = new SiteFilmsContainerView();
     this._nameFilmListElement = new NameFilmListView();
@@ -46,11 +48,17 @@ export default class Page {
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
+    this._getComments();
     this._renderPage();
 
+  }
+
+  _getComments() {
+    this._comments = this._commentsModel.getComments();
   }
 
   _getFilms() {
@@ -93,65 +101,70 @@ export default class Page {
     this._renderPage();
   }
 
-  _handleViewAction(actionType, updateType, update) {
+  _handleViewAction(actionType, updateType, update, comments) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update);
+        this._filmsModel.updateFilm(updateType, update, comments);
         break;
       case UserAction.ADD_COMMENTS:
-        // ввести модель комментариев и добавлять комментарии
+        // сейчас не правильно добавляется комментарий ,
+        //он просто добавляется в конец всего массива в виде объекта,(а не в конкретный массив внутри массива)
+        // this._commentsModel.addComment(updateType, update);
         break;
       case UserAction.DELETE_COMMENTS:
-        // вести модель комментариев и удалить комментарий
+        // аналогично , модель имеет полный массив из 15 массивов, а не один массив из объектов
+        // this._commentsModel.deleteComment(updateType, update);
         break;
     }
   }
 
-  _handleModelEvent(updateType, data) {
+  _handleModelEvent(updateType, data, comments) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenter.get(data.id).init(data);
+        this._filmPresenter.get(data.id).init(data, comments);
         if (this._topFilmPresenter.get(data.id)) {
-          this._topFilmPresenter.get(data.id).init(data);
+          this._topFilmPresenter.get(data.id).init(data, comments);
         }
         if (this._commentedFilmPresenter.get(data.id)) {
-          this._commentedFilmPresenter.get(data.id).init(data);
+          this._commentedFilmPresenter.get(data.id).init(data,comments);
         }
         break;
       case UpdateType.MINOR:
-        // - обновить список (например, когда задача ушла в архив)
         this._clearPage();
         this._renderPage();
         break;
       case UpdateType.MAJOR:
-        // - обновить всю доску (например, при переключении фильтра)
         this._clearPage({ resetRenderedFilmsCount: true, resetSortType: true });
         this._renderPage();
         break;
     }
   }
 
-  _renderFilm(filmListElement, film) {
+  _renderFilm(filmListElement, film, comment) {
     const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    filmPresenter.init(film);
+    filmPresenter.init(film, comment);
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
-  _renderTopFilm(filmListElement, film) {
-    const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    topFilmPresenter.init(film);
+  _renderTopFilm(filmListElement, film, comment) {
+    const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
+    topFilmPresenter.init(film, comment);
     this._topFilmPresenter.set(film.id, topFilmPresenter);
   }
 
-  _renderCommentedFilm(filmListElement, film) {
-    const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    commentedFilmPresenter.init(film);
+  _renderCommentedFilm(filmListElement, film, comment) {
+    const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
+    commentedFilmPresenter.init(film, comment);
     this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 
-  _renderFilms(siteElement, films, cb) {
+  _renderFilms(siteElement, films, cb, comment) {
     this._cb = cb;
-    films.forEach((film) => this._cb(siteElement, film));
+    // пока так распределила комментарии по фильмам
+    for (let i = 0; i < films.length; i++) {
+      this._cb(siteElement, films[i], comment[i]);
+    }
+    // films.forEach((film) => this._cb(siteElement, film));
   }
 
   _renderNoFilm() {
@@ -163,7 +176,8 @@ export default class Page {
     const filmsCount = this._getFilms().length;
     const newRenderedCount = Math.min(filmsCount, this._renderedCount + COUNT_PER_STEP);
     const films = this._getFilms().slice(this._renderedCount, newRenderedCount);
-    this._renderFilms(this._filmListContainer, films, this._renderFilm);
+    const comments = this._comments.slice(this._renderedCount, newRenderedCount);
+    this._renderFilms(this._filmListContainer, films, this._renderFilm, comments);
     this._renderedCount = newRenderedCount;
 
     if (this._renderedCount >= filmsCount) {
@@ -198,7 +212,7 @@ export default class Page {
     render(this._filmsContainer, additionalContainer, InsertPlace.BEFORE_END);
     render(additionalContainer, filmListContainer, InsertPlace.BEFORE_END);
     const sortFilms = sortFunction(films).slice(0, 2);
-    this._renderFilms(filmListContainer, sortFilms, this._cb);
+    this._renderFilms(filmListContainer, sortFilms, this._cb, this._comments);
   }
 
   _renderFooter(films) {
@@ -206,15 +220,6 @@ export default class Page {
     const siteFooterElement = document.querySelector('.footer');
     const siteFooterSectionElement = siteFooterElement.querySelector('.footer__statistics');
     render(siteFooterSectionElement, this._numbersFilms, InsertPlace.BEFORE_END);
-  }
-
-  _renderFilmList() {
-    const filmsCount = this._getFilms().length;
-    const films = this._getFilms().slice(0, Math.min(filmsCount, COUNT_PER_STEP));
-    this._renderFilms(this._filmListContainer, films, this._renderFilm);
-    if (filmsCount > COUNT_PER_STEP) {
-      this._renderShowMoreButton();
-    }
   }
 
   _renderPage() {
@@ -227,7 +232,7 @@ export default class Page {
     } else {
       render(this._filmsContainer, this._nameFilmListElement, InsertPlace.BEFORE_END);
       render(this._nameFilmListElement, this._filmListContainer, InsertPlace.BEFORE_END);
-      this._renderFilms(this._filmListContainer, films.slice(0, Math.min(filmsCount, this._renderedCount)), this._renderFilm);
+      this._renderFilms(this._filmListContainer, films.slice(0, Math.min(filmsCount, this._renderedCount)), this._renderFilm, this._comments);
       if (filmsCount > this._renderedCount) {
         this._renderShowMoreButton();
       }

@@ -1,7 +1,7 @@
 import MenuView from '../view/menu.js';
-import {render, InsertPlace, replace, remove} from '../utils/render.js';
-import {filter} from '../utils/filters.js';
-import {FilterType, UpdateType} from '../const.js';
+import { render, InsertPlace, replace, remove } from '../utils/render.js';
+import { filter } from '../utils/filters.js';
+import { FilterType, UpdateType } from '../const.js';
 
 export default class Filter {
   constructor(filterContainer, filterModel, filmsModel) {
@@ -42,8 +42,8 @@ export default class Filter {
     if (this._filterModel.getFilter() === filterType) {
       return;
     }
-
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+    // как мне обойти место чтобы не передавать третьим параметром комментарии ?
+    this._filterModel.setFilter(UpdateType.MAJOR, filterType,);
   }
 
   _getFilters() {

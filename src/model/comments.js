@@ -14,23 +14,27 @@ export default class Comments extends AbstractObserver {
     return this._comments;
   }
 
+  // getCommentsFilm(film, count) {
+  //   return this._comments[count];
+  // }
   //метод принять id фильма и вернуть комментарии к фильму
+  /*
+    updateComment(updateType, update) {
+      const index = this._comments.findIndex((comment) => comment.id === update.id);
 
-  updateComment(updateType, update) {
-    const index = this._comments.findIndex((comment) => comment.id === update.id);
+      if (index === -1) {
+        throw new Error('Can\'t update unexisting comment');
+      }
 
-    if (index === -1) {
-      throw new Error('Can\'t update unexisting comment');
+      this._comments = [
+        ...this._comments.slice(0, index),
+        update,
+        ...this._comments.slice(index + 1),
+      ];
+
+      this._notify(updateType, update);
     }
-
-    this._comments = [
-      ...this._comments.slice(0, index),
-      update,
-      ...this._comments.slice(index + 1),
-    ];
-
-    this._notify(updateType, update);
-  }
+  */
 
   addComment(updateType, update) {
     this._comments = [

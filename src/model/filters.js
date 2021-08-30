@@ -7,9 +7,9 @@ export default class Filter extends AbstractObserver {
     this._activeFilter = FilterType.ALL;
   }
 
-  setFilter(updateType, filter) {
+  setFilter(updateType, filter, comments) {
     this._activeFilter = filter;
-    this._notify(updateType, filter);
+    this._notify(updateType, filter, comments);
   }
 
   getFilter() {
