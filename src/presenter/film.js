@@ -27,13 +27,13 @@ export default class Film {
   init(film, comments) {
     this._film = film;
     this._comments = comments;
-    this._comments = this._getCommentsFilm(film);
+    this._comments = this._getCommentsFilm(this._film);
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
-    this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
+    this._filmComponent = new FilmView(this._film);
+    this._popupComponent = new PopupView(this._film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);

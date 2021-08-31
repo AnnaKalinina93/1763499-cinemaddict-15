@@ -110,11 +110,11 @@ export default class Page {
         // сейчас не правильно добавляется комментарий ,
         //он просто добавляется в конец всего массива в виде объекта,(а не в конкретный массив внутри массива)
         //надо мне настроить модель комментариев для одного фильма и можно будет воспользоваться этой же логикой
-        // this._commentsModel.addComment(updateType, update);
+        this._commentsModel.addComment(updateType, update, comments);
         break;
       case UserAction.DELETE_COMMENTS:
         // аналогично , модель имеет полный массив из 15 массивов, а не один массив из объектов
-        // this._commentsModel.deleteComment(updateType, update);
+        this._commentsModel.deleteComment(updateType, update, comments);
         break;
     }
   }

@@ -6,11 +6,11 @@ export default class Filter extends AbstractObserver {
     super();
     this._activeFilter = FilterType.ALL;
   }
-  // вот тут про третий параметр я писала, как мне от него избавиться?
 
-  setFilter(updateType, filter, comments) {
+
+  setFilter(updateType, filter) {
     this._activeFilter = filter;
-    this._notify(updateType, filter, comments);
+    this._notify(updateType, filter);
   }
 
   getFilter() {

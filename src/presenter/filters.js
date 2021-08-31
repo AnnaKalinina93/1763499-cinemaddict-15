@@ -42,7 +42,6 @@ export default class Filter {
     if (this._filterModel.getFilter() === filterType) {
       return;
     }
-    // как мне обойти место чтобы не передавать третьим параметром комментарии ?
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 

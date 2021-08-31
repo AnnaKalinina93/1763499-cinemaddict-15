@@ -213,21 +213,21 @@ export default class Popup extends SmartView {
   }
 
   _favoriteClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop,
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.favoriteClick();
   }
 
   _watchlistClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop,
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.watchlistClick();
   }
 
   _alreadyWatchedClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop,
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.alreadyWatchedClick();
@@ -305,8 +305,6 @@ export default class Popup extends SmartView {
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
   }
 
-  // обрабатывает инпут текстари , не перерисовывая его , но обновляя данные ( добавляем newComment)
-
   _textInputHandler(evt) {
     evt.preventDefault();
     this.updateData(
@@ -329,10 +327,8 @@ export default class Popup extends SmartView {
 
   }
 
-  // обрабатваем чекбоксы с эмоджи, перерисовывая сразу всю страницу, чтобы в диве появлялся выбранный смайл
-
   _emojiHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop,
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this.updateData(
       Object.assign(
@@ -359,30 +355,19 @@ export default class Popup extends SmartView {
     if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji || this._newComment.text) {
-        // если есть обнавленные данные , то новый комментарий добавляем в конец массива
-        //и парсим в обратную сторону и заодно перерисовываем попап
         this._scrollPosition = this.getElement().scrollTop;
-        this._addingNewCooment();
-        this.updateData(
-          Object.assign(
-            {},
-            this._data,
-            {
-              isComments: this._data.comments.length !== 0,
-            },
-          ),
-        );
+        this._createNewCooment();
+        const comments = this._data.comments;
+        comments[comments.length] = this._newComment.id;
         this._data = Popup.parseDataToFilm(this._data);
-        this._saveScroll(this._scrollPosition);
-        this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
+        this._changeData(UserAction.ADD_COMMENTS, UpdateType.PATCH, this._data, this._newComment);
+        this._newComment = {};
         this._saveScroll(this._scrollPosition);
       }
     }
   }
-  // пушим новый комментарий в конец массива комментариев
 
-  _addingNewCooment() {
-    //если бы быда подключена модель комментариев к одному фильму, то можно было бы делать через нее
+  _createNewCooment() {
     const dueDate = dayjs();
     this._updateNewComment(
       Object.assign(
@@ -394,50 +379,31 @@ export default class Popup extends SmartView {
           dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
         },
       ), true);
-
-    const comments = this._data.comments;
-    const newcomment = this._newComment;
-    const correctComments = this._comments;
-    correctComments[correctComments.length] = newcomment;
-    this._comments = correctComments;
-    comments[comments.length] = newcomment.id;
-    this.updateData(Object.assign(
-      {},
-      this._data,
-      {
-        comments: comments,
-      },
-    ), true);
-
-    this._newComment = {};
-
   }
   // удаляем комментарии
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
-    // если бы была модель можно было бы удалить через ее метод
     this._scrollPosition = this.getElement().scrollTop;
-    this._comments.forEach((comment) => {
-      if (comment.id === evt.target.id) {
-        this._comments = this._delete(this._comments, comment);
-      }
-    });
     const comments = this._delete(this._data.comments, evt.target.id);
-    this.updateData(Object.assign(
-      {},
-      this._data,
-      {
-        comments: comments,
-      },
-    ), true);
     this._data = Popup.parseDataToFilm(this._data);
-    this._changeData(UserAction.UPDATE_FILM, UpdateType.PATCH, this._data, this._comments);
-    this._saveScroll(this._scrollPosition);
+    const index = this._comments.findIndex((comment) => comment.id === evt.target.id);
+    this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index]);
+    this._changeData(
+      UserAction.UPDATE_FILM,
+      UpdateType.PATCH,
+      Object.assign(
+        {},
+        this._data,
+        {
+          comments: comments,
+        },
+      ), this._comments);
+
   }
 
   _delete(comments, update) {
-    const index = comments.findIndex((comment) => comment.id === update.id);
+    const index = comments.findIndex((comment) => comment === update);
     return [
       ...comments.slice(0, index),
       ...comments.slice(index + 1),

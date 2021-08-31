@@ -13,41 +13,18 @@ export default class Comments extends AbstractObserver {
   getComments() {
     return this._comments;
   }
-  // модель пока возвращает массив из массивов комментариев
 
-  // getCommentsFilm(film, count) {
-  //   return this._comments[count];
-  // }
-  //метод принять id фильма и вернуть комментарии к фильму
-  /*
-    updateComment(updateType, update) {
-      const index = this._comments.findIndex((comment) => comment.id === update.id);
-
-      if (index === -1) {
-        throw new Error('Can\'t update unexisting comment');
-      }
-
-      this._comments = [
-        ...this._comments.slice(0, index),
-        update,
-        ...this._comments.slice(index + 1),
-      ];
-
-      this._notify(updateType, update);
-    }
-  */
-
-  addComment(updateType, update) {
+  addComment(updateType, update, comments) {
     this._comments = [
-      update,
       ...this._comments,
+      comments,
     ];
 
-    this._notify(updateType, update);
+    this._notify(updateType, update, this._comments);
   }
 
-  deleteComment(updateType, update) {
-    const index = this._comments.findIndex((comment) => comment.id === update.id);
+  deleteComment(updateType, update, comments) {
+    const index = this._comments.findIndex((comment) => comment.id === comments.id);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
@@ -58,6 +35,6 @@ export default class Comments extends AbstractObserver {
       ...this._comments.slice(index + 1),
     ];
 
-    this._notify(updateType);
+    this._notify(updateType, update, this._comments);
   }
 }
