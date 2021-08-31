@@ -127,7 +127,7 @@ export default class Page {
           this._topFilmPresenter.get(data.id).init(data, comments);
         }
         if (this._commentedFilmPresenter.get(data.id)) {
-          this._commentedFilmPresenter.get(data.id).init(data,comments);
+          this._commentedFilmPresenter.get(data.id).init(data, comments);
         }
         break;
       case UpdateType.MINOR:
@@ -141,31 +141,27 @@ export default class Page {
     }
   }
 
-  _renderFilm(filmListElement, film, comment) {
+  _renderFilm(filmListElement, film, comments) {
     const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    filmPresenter.init(film, comment);
+    filmPresenter.init(film, comments);
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
-  _renderTopFilm(filmListElement, film, comment) {
+  _renderTopFilm(filmListElement, film, comments) {
     const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    topFilmPresenter.init(film, comment);
+    topFilmPresenter.init(film, comments);
     this._topFilmPresenter.set(film.id, topFilmPresenter);
   }
 
-  _renderCommentedFilm(filmListElement, film, comment) {
+  _renderCommentedFilm(filmListElement, film, comments) {
     const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    commentedFilmPresenter.init(film, comment);
+    commentedFilmPresenter.init(film, comments);
     this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 
-  _renderFilms(siteElement, films, cb, comment) {
+  _renderFilms(siteElement, films, cb, comments) {
     this._cb = cb;
-    // пока так распределила комментарии по фильмам
-    for (let i = 0; i < films.length; i++) {
-      this._cb(siteElement, films[i], comment[i]);
-    }
-    // films.forEach((film) => this._cb(siteElement, film));
+    films.forEach((film) => this._cb(siteElement, film, comments));
   }
 
   _renderNoFilm() {

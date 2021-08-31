@@ -6,11 +6,14 @@ import FilterPresenter from './presenter/filters.js';
 import FilmsModel from './model/films.js';
 import CommentsModel from './model/comments.js';
 import FilterModel from './model/filters.js';
-import { comments } from './mock/comments.js';
+import { getComments } from './mock/comments.js';
 
 const COUNT = 15;
 const films = new Array(COUNT).fill().map(generateData);
-const commentsArray = new Array(COUNT).fill().map(comments);
+const idComments = films.map((film)=> film.comments).flat();
+const commentsArray = [];
+idComments.forEach((id)=>commentsArray.push(getComments(id)));
+
 
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();

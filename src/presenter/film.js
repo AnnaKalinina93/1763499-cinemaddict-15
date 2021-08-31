@@ -3,7 +3,6 @@ import FilmView from '../view/film.js';
 import PopupView from '../view/popup.js';
 import { UserAction, UpdateType, Mode, FilterType } from '../const.js';
 
-
 export default class Film {
   constructor(filmListElement, changeData, changeMode, filterType) {
     this._filmListElement = filmListElement;
@@ -25,9 +24,10 @@ export default class Film {
 
   }
 
-  init(film, comment) {
+  init(film, comments) {
     this._film = film;
-    this._comments = comment;
+    this._comments = comments;
+    this._comments = this._getCommentsFilm(film);
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
@@ -65,6 +65,11 @@ export default class Film {
     remove(prevFilmComponent);
     remove(prevPopupComponent);
 
+  }
+
+  _getCommentsFilm(film) {
+    const commentsIds = film.comments;
+    return this._comments.filter((comment) => commentsIds.includes(comment.id));
   }
 
   destroy() {

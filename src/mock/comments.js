@@ -1,6 +1,6 @@
-import { getRandomArrayElement , getRandomInteger} from '../utils/common.js';
-import { generateDate,  getTimeFormat, getDayMonthFormat } from '../day.js';
-import { nanoid } from 'nanoid';
+import { getRandomArrayElement } from '../utils/common.js';
+import { generateDate, getTimeFormat, getDayMonthFormat } from '../day.js';
+
 
 const TEXT = [
   'Interesting setting and a good cast',
@@ -21,16 +21,15 @@ const AVTOR = [
   'Robert Shenisy',
 ];
 
-const getComments = () => {
+const getComments = (id) => {
   const dueDate = generateDate();
   return {
-    id: nanoid(),
+    id: id,
     text: getRandomArrayElement(TEXT),
     emoji: getRandomArrayElement(EMOJI),
     avtor: getRandomArrayElement(AVTOR),
-    dueDate:`${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
+    dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
   };
 };
-//const COUNT = getRandomInteger(0,6);
-const comments = () => new Array(5).fill().map(getComments);
-export {getComments, comments};
+
+export { getComments };

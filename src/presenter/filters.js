@@ -43,7 +43,7 @@ export default class Filter {
       return;
     }
     // как мне обойти место чтобы не передавать третьим параметром комментарии ?
-    this._filterModel.setFilter(UpdateType.MAJOR, filterType,);
+    this._filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 
   _getFilters() {
