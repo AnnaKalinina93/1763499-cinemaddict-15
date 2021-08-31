@@ -199,6 +199,7 @@ export default class Popup extends SmartView {
     this._emojiHandler = this._emojiHandler.bind(this);
     this._sendCommentHandler = this._sendCommentHandler.bind(this);
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
+    this._scrollHandler= this._scrollHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -213,21 +214,21 @@ export default class Popup extends SmartView {
   }
 
   _favoriteClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop;
+    //this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.favoriteClick();
   }
 
   _watchlistClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop;
+    //this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.watchlistClick();
   }
 
   _alreadyWatchedClickHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop;
+    // this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this._saveScroll(this._scrollPosition);
     this._callback.alreadyWatchedClick();
@@ -303,6 +304,7 @@ export default class Popup extends SmartView {
     document.addEventListener('keydown', this._sendCommentHandler);
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
+    this.getElement().addEventListener('scroll',this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -328,7 +330,7 @@ export default class Popup extends SmartView {
   }
 
   _emojiHandler(evt) {
-    this._scrollPosition = this.getElement().scrollTop;
+    // this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this.updateData(
       Object.assign(
@@ -355,14 +357,13 @@ export default class Popup extends SmartView {
     if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji || this._newComment.text) {
-        this._scrollPosition = this.getElement().scrollTop;
+        //   this._scrollPosition = this.getElement().scrollTop;
         this._createNewCooment();
         const comments = this._data.comments;
         comments[comments.length] = this._newComment.id;
         this._data = Popup.parseDataToFilm(this._data);
-        this._changeData(UserAction.ADD_COMMENTS, UpdateType.PATCH, this._data, this._newComment);
+        this._changeData(UserAction.ADD_COMMENTS, UpdateType.PATCH, this._data, this._newComment, this._scrollPosition);
         this._newComment = {};
-        this._saveScroll(this._scrollPosition);
       }
     }
   }
@@ -384,11 +385,11 @@ export default class Popup extends SmartView {
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
-    this._scrollPosition = this.getElement().scrollTop;
+    //this._scrollPosition = this.getElement().scrollTop;
     const comments = this._delete(this._data.comments, evt.target.id);
     this._data = Popup.parseDataToFilm(this._data);
     const index = this._comments.findIndex((comment) => comment.id === evt.target.id);
-    this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index]);
+    this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index], this._scrollPosition);
     this._changeData(
       UserAction.UPDATE_FILM,
       UpdateType.PATCH,
@@ -398,7 +399,7 @@ export default class Popup extends SmartView {
         {
           comments: comments,
         },
-      ), this._comments);
+      ), this._comments, this._scrollPosition);
 
   }
 
@@ -408,6 +409,11 @@ export default class Popup extends SmartView {
       ...comments.slice(0, index),
       ...comments.slice(index + 1),
     ];
+  }
+
+  _scrollHandler(evt) {
+    evt.preventDefault();
+    this._scrollPosition= evt.target.offsetHeight;
   }
 
   restoreHandlers() {

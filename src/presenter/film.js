@@ -13,7 +13,7 @@ export default class Film {
     this._siteBodyElement = document.querySelector('body');
     this._mode = Mode.DEFAULT;
     this._filterType = filterType;
-    this._scrollPosition = null;
+
 
     this._handleOpenClick = this._handleOpenClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
@@ -24,9 +24,10 @@ export default class Film {
 
   }
 
-  init(film, comments) {
+  init(film, comments, scrollPosition) {
     this._film = film;
     this._comments = comments;
+    this._scrollPosition = scrollPosition;
     this._comments = this._getCommentsFilm(this._film);
 
     const prevFilmComponent = this._filmComponent;
@@ -59,7 +60,7 @@ export default class Film {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
       this._siteBodyElement.classList.add('hide-overflow');
-      this._siteBodyElement.scrollTop = this._scrollPosition;
+      this.getElement().scroll(0,this._scrollPosition);
     }
 
     remove(prevFilmComponent);
@@ -96,7 +97,7 @@ export default class Film {
             favorite: !this._film.userDetails.favorite,
           },
         },
-      ), this._comments,
+      ), this._comments, this._scrollPosition,
     );
     this._siteBodyElement.scrollTop = this._scrollPosition;
   }
@@ -114,7 +115,7 @@ export default class Film {
             watchlist: !this._film.userDetails.watchlist,
           },
         },
-      ), this._comments,
+      ), this._comments, this._scrollPosition,
     );
     this._siteBodyElement.scrollTop = this._scrollPosition;
   }
@@ -132,7 +133,7 @@ export default class Film {
             alreadyWatched: !this._film.userDetails.alreadyWatched,
           },
         },
-      ), this._comments,
+      ), this._comments, this._scrollPosition,
     );
     this._siteBodyElement.scrollTop = this._scrollPosition;
   }
@@ -180,7 +181,6 @@ export default class Film {
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
   }
-  // пыталась записать таким способом данные скролла, он добавляется, но на следующем шаге сбрасывается
 
   _saveScroll(scrollPosition) {
     this._scrollPosition = scrollPosition;

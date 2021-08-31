@@ -29,6 +29,7 @@ export default class Page {
     this._topNameElement = new AdditionalContainerView(TOP_NAME);
     this._commentedNameElement = new AdditionalContainerView(MOST_COMMENTED_NAME);
     this._showMoreButton = null;
+    this._scrollPosition = null;
     this._filterModel = filterModel;
     this._filterType = FilterType.ALL;
 
@@ -101,33 +102,29 @@ export default class Page {
     this._renderPage();
   }
 
-  _handleViewAction(actionType, updateType, update, comments) {
+  _handleViewAction(actionType, updateType, update, comments, scrollPosition) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update, comments);
+        this._filmsModel.updateFilm(updateType, update, comments, scrollPosition);
         break;
       case UserAction.ADD_COMMENTS:
-        // сейчас не правильно добавляется комментарий ,
-        //он просто добавляется в конец всего массива в виде объекта,(а не в конкретный массив внутри массива)
-        //надо мне настроить модель комментариев для одного фильма и можно будет воспользоваться этой же логикой
-        this._commentsModel.addComment(updateType, update, comments);
+        this._commentsModel.addComment(updateType, update, comments, scrollPosition);
         break;
       case UserAction.DELETE_COMMENTS:
-        // аналогично , модель имеет полный массив из 15 массивов, а не один массив из объектов
-        this._commentsModel.deleteComment(updateType, update, comments);
+        this._commentsModel.deleteComment(updateType, update, comments, scrollPosition);
         break;
     }
   }
 
-  _handleModelEvent(updateType, data, comments) {
+  _handleModelEvent(updateType, data, comments, scrollPosition) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenter.get(data.id).init(data, comments);
+        this._filmPresenter.get(data.id).init(data, comments, scrollPosition);
         if (this._topFilmPresenter.get(data.id)) {
-          this._topFilmPresenter.get(data.id).init(data, comments);
+          this._topFilmPresenter.get(data.id).init(data, comments, scrollPosition);
         }
         if (this._commentedFilmPresenter.get(data.id)) {
-          this._commentedFilmPresenter.get(data.id).init(data, comments);
+          this._commentedFilmPresenter.get(data.id).init(data, comments, scrollPosition);
         }
         break;
       case UpdateType.MINOR:
@@ -143,19 +140,19 @@ export default class Page {
 
   _renderFilm(filmListElement, film, comments) {
     const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    filmPresenter.init(film, comments);
+    filmPresenter.init(film, comments,this._scrollPosition);
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
   _renderTopFilm(filmListElement, film, comments) {
     const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    topFilmPresenter.init(film, comments);
+    topFilmPresenter.init(film, comments,this._scrollPosition);
     this._topFilmPresenter.set(film.id, topFilmPresenter);
   }
 
   _renderCommentedFilm(filmListElement, film, comments) {
     const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    commentedFilmPresenter.init(film, comments);
+    commentedFilmPresenter.init(film, comments,this._scrollPosition);
     this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 

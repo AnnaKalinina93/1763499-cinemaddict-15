@@ -14,16 +14,16 @@ export default class Comments extends AbstractObserver {
     return this._comments;
   }
 
-  addComment(updateType, update, comments) {
+  addComment(updateType, update, comments, scroll) {
     this._comments = [
       ...this._comments,
       comments,
     ];
 
-    this._notify(updateType, update, this._comments);
+    this._notify(updateType, update, this._comments, scroll);
   }
 
-  deleteComment(updateType, update, comments) {
+  deleteComment(updateType, update, comments, scroll) {
     const index = this._comments.findIndex((comment) => comment.id === comments.id);
 
     if (index === -1) {
@@ -35,6 +35,6 @@ export default class Comments extends AbstractObserver {
       ...this._comments.slice(index + 1),
     ];
 
-    this._notify(updateType, update, this._comments);
+    this._notify(updateType, update, this._comments, scroll);
   }
 }
