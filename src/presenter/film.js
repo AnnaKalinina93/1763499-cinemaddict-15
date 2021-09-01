@@ -60,7 +60,7 @@ export default class Film {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
       this._siteBodyElement.classList.add('hide-overflow');
-      this.getElement().scroll(0,this._scrollPosition);
+      this._siteBodyElement.scroll(0,this._scrollPosition);
     }
 
     remove(prevFilmComponent);
