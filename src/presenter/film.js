@@ -1,14 +1,10 @@
 import { render, InsertPlace, remove, replace, isEscape } from '../utils/render.js';
 import FilmView from '../view/film.js';
 import PopupView from '../view/popup.js';
+import { UserAction, UpdateType, Mode, FilterType } from '../const.js';
 
-
-const Mode = {
-  DEFAULT: 'DEFAULT',
-  POPUP: 'POPUP',
-};
 export default class Film {
-  constructor(filmListElement, changeData, changeMode) {
+  constructor(filmListElement, changeData, changeMode, filterType) {
     this._filmListElement = filmListElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
@@ -16,6 +12,8 @@ export default class Film {
     this._popupComponent = null;
     this._siteBodyElement = document.querySelector('body');
     this._mode = Mode.DEFAULT;
+    this._filterType = filterType;
+
 
     this._handleOpenClick = this._handleOpenClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
@@ -26,14 +24,17 @@ export default class Film {
 
   }
 
-  init(film) {
+  init(film, comments, scrollPosition) {
     this._film = film;
+    this._comments = comments;
+    this._scrollPosition = scrollPosition;
+    this._comments = this._getCommentsFilm(this._film);
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
 
-    this._filmComponent = new FilmView(film);
-    this._popupComponent = new PopupView(film, this._changeData);
+    this._filmComponent = new FilmView(this._film);
+    this._popupComponent = new PopupView(this._film, this._changeData, this._comments, this._scrollPosition, this._saveScroll);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);
@@ -58,11 +59,18 @@ export default class Film {
     if (this._siteBodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
+      this._siteBodyElement.classList.add('hide-overflow');
+      this._siteBodyElement.scroll(0,this._scrollPosition);
     }
 
     remove(prevFilmComponent);
     remove(prevPopupComponent);
 
+  }
+
+  _getCommentsFilm(film) {
+    const commentsIds = film.comments;
+    return this._comments.filter((comment) => commentsIds.includes(comment.id));
   }
 
   destroy() {
@@ -71,13 +79,15 @@ export default class Film {
   }
 
   resetView() {
-    if (this._mode !== Mode.DEFAULT) {
+    if (this._mode === Mode.DEFAULT) {
       this._closePopupFilm();
     }
   }
 
   _handleFavoriteClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      this._filterType !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -87,12 +97,15 @@ export default class Film {
             favorite: !this._film.userDetails.favorite,
           },
         },
-      ),
+      ), this._comments, this._scrollPosition,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleWatchlistClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      this._filterType !== FilterType.WATCHLIST ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -102,12 +115,15 @@ export default class Film {
             watchlist: !this._film.userDetails.watchlist,
           },
         },
-      ),
+      ), this._comments, this._scrollPosition,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleAlreadyWatchedClick() {
     this._changeData(
+      UserAction.UPDATE_FILM,
+      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,
       Object.assign(
         {},
         this._film,
@@ -117,13 +133,15 @@ export default class Film {
             alreadyWatched: !this._film.userDetails.alreadyWatched,
           },
         },
-      ),
+      ), this._comments, this._scrollPosition,
     );
+    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleOpenClick() {
     this._openPopupFilm();
     document.addEventListener('keydown', this._onEscKeyDown);
+    this._siteBodyElement.classList.add('hide-overflow');
   }
 
   _handleCloseClick() {
@@ -132,10 +150,14 @@ export default class Film {
   }
 
   _openPopupFilm() {
-    this._siteBodyElement.classList.add('hide-overflow');
+    if (document.querySelector('.film-details')) {
+      document.querySelector('.film-details').remove();
+    }
     render(this._siteBodyElement, this._popupComponent, InsertPlace.BEFORE_END);
-    this._changeMode();
+
     this._mode = Mode.POPUP;
+    this._changeMode();
+
   }
 
   _closePopupFilm() {
@@ -151,6 +173,17 @@ export default class Film {
       this._closePopupFilm();
       document.removeEventListener('keydown', this._onEscKeyDown);
     }
+  }
+
+  _restoreHandlers() {
+    this._popupComponent.setClickHandler(this._handleCloseClick);
+    this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
+    this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
+    this._popupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
+  }
+
+  _saveScroll(scrollPosition) {
+    this._scrollPosition = scrollPosition;
   }
 
 }

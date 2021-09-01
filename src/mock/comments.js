@@ -1,5 +1,6 @@
-import { getRandomInteger, getRandomArrayElement} from '../utils/common.js';
-import { generateDate,  getTimeFormat, getDayMonthFormat } from '../day.js';
+import { getRandomArrayElement } from '../utils/common.js';
+import { generateDate, getTimeFormat, getDayMonthFormat } from '../day.js';
+
 
 const TEXT = [
   'Interesting setting and a good cast',
@@ -20,15 +21,15 @@ const AVTOR = [
   'Robert Shenisy',
 ];
 
-const getComments = () => {
+const getComments = (id) => {
   const dueDate = generateDate();
   return {
-    id: getRandomInteger(1,5),
+    id: id,
     text: getRandomArrayElement(TEXT),
     emoji: getRandomArrayElement(EMOJI),
     avtor: getRandomArrayElement(AVTOR),
-    dueDate:`${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
+    dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
   };
 };
 
-export {getComments};
+export { getComments };

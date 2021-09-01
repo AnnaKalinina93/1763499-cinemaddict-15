@@ -1,6 +1,6 @@
 import { getRandomInteger, getRandomArrayElement, getRandomArray, getRandomFractionalNumber } from '../utils/common.js';
-import { getComments } from './comments';
 import { generateDate} from '../day.js';
+import { nanoid } from 'nanoid';
 
 const TITLES = [
   'Made for each other',
@@ -63,17 +63,13 @@ const COUNTRIES = [
   'Germany',
   'Italy',
 ];
-let currentId = 1;
 
 const generateData = () => {
-  const COUNT = getRandomInteger(0, 5);
-  const comments = new Array(COUNT).fill().map(getComments);
   const title = getRandomArrayElement(TITLES);
   const date = generateDate();
-  currentId += 1;
   return {
-    id: currentId,
-    comments,
+    id: nanoid(),
+    comments: [nanoid(),nanoid(),nanoid(),nanoid(),nanoid()],
     filmInfo: {
       title,
       alternativeTitle: title,
