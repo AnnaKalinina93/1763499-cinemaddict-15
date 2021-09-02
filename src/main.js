@@ -28,6 +28,7 @@ const siteMainElement = document.querySelector('.main');
 const pagePresenter = new PagePresenter(siteMainElement, filmsModel, filterModel, commentsModel);
 const staticElement = new StatisticsView(films);
 render(siteMainElement, staticElement, InsertPlace.BEFORE_END);
+staticElement.setCharts();
 staticElement.hide();
 const handleSiteMenuClick = (filterType) => {
   if (filterType === FilterType.STATISTICS) {

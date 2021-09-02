@@ -1,7 +1,75 @@
 import SmartView from './smart.js';
+import { filter } from '../utils/filters.js';
+import { FilterType } from '../const.js';
+import dayjs from 'dayjs';
+import Chart from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-const createStatisticsTemplate = (films) => {
-  films.forEach((film) => film.comments);
+const createFilmsChart = (statisticCtx) => {
+  const BAR_HEIGHT = 50;
+
+  // Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
+  statisticCtx.height = BAR_HEIGHT * 5;
+
+  return new Chart(statisticCtx, {
+    plugins: [ChartDataLabels],
+    type: 'horizontalBar',
+    data: {
+      labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],//жанры
+      datasets: [{
+        data: [11, 8, 7, 4, 3],//количесвто фильмов по каждому жанру
+        backgroundColor: '#ffe800',
+        hoverBackgroundColor: '#ffe800',
+        anchor: 'start',//?
+      }],
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20,
+          },
+          color: '#ffffff',
+          anchor: 'start',
+          align: 'start',
+          offset: 40,
+        },
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: '#ffffff',
+            padding: 100,
+            fontSize: 20,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+          barThickness: 24,
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true,
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false,
+          },
+        }],
+      },
+      legend: {
+        display: false,
+      },
+      tooltips: {
+        enabled: false,
+      },
+    },
+  });
+};
+const createStatisticsTemplate = (watchedFilms) => {
+  const totalDuration = watchedFilms.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b);
   return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -31,11 +99,11 @@ const createStatisticsTemplate = (films) => {
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">22 <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${watchedFilms.length} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
-        <p class="statistic__item-text">130 <span class="statistic__item-description">h</span> 22 <span class="statistic__item-description">m</span></p>
+        <p class="statistic__item-text">${dayjs.duration(totalDuration, 'm').format('H')} <span class="statistic__item-description">h</span> ${dayjs.duration(totalDuration, 'm').format('mm')} <span class="statistic__item-description">m</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
@@ -57,26 +125,23 @@ export default class Statistics extends SmartView {
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
 
-    this._setCharts();
-    this._setDatepicker();
+
   }
 
   removeElement() {
     super.removeElement();
-
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._data);
+    return createStatisticsTemplate(this._data, this._getWatchedFilms());
   }
 
   restoreHandlers() {
     this._setCharts();
-    this._setDatepicker();
+  }
+
+  _getWatchedFilms() {
+    return filter[FilterType.HISTORY](this._data);
   }
 
   _dateChangeHandler([dateFrom, dateTo]) {
@@ -90,16 +155,9 @@ export default class Statistics extends SmartView {
     });
   }
 
-  _setDatepicker() {
-    if (this._datepicker) {
-      this._datepicker.destroy();
-      this._datepicker = null;
-    }
-
-  }
-
-  _setCharts() {
-    // Нужно отрисовать два графика
+  setCharts() {
+    const statisticCtx = document.querySelector('.statistic__chart');
+    createFilmsChart(statisticCtx);
   }
 
 }
