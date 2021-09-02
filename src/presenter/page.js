@@ -47,15 +47,15 @@ export default class Page {
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
 
-    this._filmsModel.addObserver(this._handleModelEvent);
-    this._filterModel.addObserver(this._handleModelEvent);
-    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   init() {
     this._getComments();
     this._renderPage();
 
+    this._filmsModel.addObserver(this._handleModelEvent);
+    this._filterModel.addObserver(this._handleModelEvent);
+    this._commentsModel.addObserver(this._handleModelEvent);
   }
 
   _getComments() {
@@ -140,19 +140,19 @@ export default class Page {
 
   _renderFilm(filmListElement, film, comments) {
     const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    filmPresenter.init(film, comments,this._scrollPosition);
+    filmPresenter.init(film, comments, this._scrollPosition);
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
   _renderTopFilm(filmListElement, film, comments) {
     const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    topFilmPresenter.init(film, comments,this._scrollPosition);
+    topFilmPresenter.init(film, comments, this._scrollPosition);
     this._topFilmPresenter.set(film.id, topFilmPresenter);
   }
 
   _renderCommentedFilm(filmListElement, film, comments) {
     const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    commentedFilmPresenter.init(film, comments,this._scrollPosition);
+    commentedFilmPresenter.init(film, comments, this._scrollPosition);
     this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 
@@ -273,4 +273,30 @@ export default class Page {
     }
   }
 
+  hide() {
+    this._sortFilms.hide();
+    this._filmsContainer.hide();
+    this._nameFilmListElement.hide();
+    this._filmListContainer.hide();
+    this._filmPresenter.forEach((item)=> item._filmComponent.hide());
+    this._topNameElement.hide();
+    this._commentedNameElement.hide();
+    this._showMoreButton.hide();
+    this._topFilmPresenter.forEach((item)=> item._filmComponent.hide());
+    this._commentedFilmPresenter.forEach((item)=>  item._filmComponent.hide());
+  }
+
+  show() {
+    this._sortFilms.show();
+    this._filmsContainer.show();
+    this._nameFilmListElement.show();
+    this._filmListContainer.show();
+    this._filmPresenter.forEach((item)=> item._filmComponent.show());
+    this._topNameElement.show();
+    this._commentedNameElement.show();
+    this._showMoreButton.show();
+    this._topFilmPresenter.forEach((item)=> item._filmComponent.show());
+    this._commentedFilmPresenter.forEach((item)=>  item._filmComponent.show());
+
+  }
 }

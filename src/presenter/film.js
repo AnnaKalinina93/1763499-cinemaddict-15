@@ -60,7 +60,7 @@ export default class Film {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
       this._siteBodyElement.classList.add('hide-overflow');
-      this._siteBodyElement.scroll(0,this._scrollPosition);
+      this._siteBodyElement.scroll(0, this._scrollPosition);
     }
 
     remove(prevFilmComponent);
@@ -163,7 +163,10 @@ export default class Film {
   _closePopupFilm() {
 
     this._siteBodyElement.classList.remove('hide-overflow');
+    this._changeData(UserAction.UPDATE_FILM,
+      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
     this._popupComponent.getElement().remove();
+
     this._mode = Mode.DEFAULT;
   }
 

@@ -3,6 +3,7 @@ import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
 import dayjs from 'dayjs';
 import { UpdateType, UserAction } from '../const.js';
+//import { isEscape } from '../utils/render.js';
 import { nanoid } from 'nanoid';
 import he from 'he';
 
@@ -199,7 +200,7 @@ export default class Popup extends SmartView {
     this._emojiHandler = this._emojiHandler.bind(this);
     this._sendCommentHandler = this._sendCommentHandler.bind(this);
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
-    this._scrollHandler= this._scrollHandler.bind(this);
+    this._scrollHandler = this._scrollHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -210,6 +211,12 @@ export default class Popup extends SmartView {
   _clickHandler(evt) {
     evt.preventDefault();
     this._newComment = {};
+    this._updateNewComment(
+      Object.assign(
+        {},
+        this._newComment,
+        this._newComment,
+      ));
     this._callback.click();
   }
 
@@ -304,7 +311,7 @@ export default class Popup extends SmartView {
     document.addEventListener('keydown', this._sendCommentHandler);
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
-    this.getElement().addEventListener('scroll',this._scrollHandler);
+    this.getElement().addEventListener('scroll', this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -413,7 +420,7 @@ export default class Popup extends SmartView {
 
   _scrollHandler(evt) {
     evt.preventDefault();
-    this._scrollPosition= evt.target.offsetHeight;
+    this._scrollPosition = evt.target.offsetHeight;
   }
 
   restoreHandlers() {
