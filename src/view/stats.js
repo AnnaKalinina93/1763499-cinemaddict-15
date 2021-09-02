@@ -4,23 +4,24 @@ import { FilterType } from '../const.js';
 import dayjs from 'dayjs';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
+import { getNumbeFilmsByGenre, getSortGenresFilms } from '../utils/filters.js';
 
-const createFilmsChart = (statisticCtx) => {
+const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
-
-  // Обязательно рассчитайте высоту canvas, она зависит от количества элементов диаграммы
-  statisticCtx.height = BAR_HEIGHT * 5;
+  const genres = Object.keys(genresByFilms);
+  const numberFilms = Object.values(genresByFilms);
+  statisticCtx.height = BAR_HEIGHT * genres.length;
 
   return new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
     type: 'horizontalBar',
     data: {
-      labels: ['Sci-Fi', 'Animation', 'Fantasy', 'Comedy', 'TV Series'],//жанры
+      labels: genres,
       datasets: [{
-        data: [11, 8, 7, 4, 3],//количесвто фильмов по каждому жанру
+        data: numberFilms,
         backgroundColor: '#ffe800',
         hoverBackgroundColor: '#ffe800',
-        anchor: 'start',//?
+        anchor: 'start',
       }],
     },
     options: {
@@ -68,7 +69,7 @@ const createFilmsChart = (statisticCtx) => {
     },
   });
 };
-const createStatisticsTemplate = (watchedFilms) => {
+const createStatisticsTemplate = (watchedFilms, sortGenres) => {
   const totalDuration = watchedFilms.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b);
   return `<section class="statistic">
     <p class="statistic__rank">
@@ -107,7 +108,7 @@ const createStatisticsTemplate = (watchedFilms) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">Sci-Fi</p>
+        <p class="statistic__item-text">${sortGenres === null ? '' : Object.keys(sortGenres)[0]}</p>
       </li>
     </ul>
 
@@ -121,7 +122,7 @@ export default class Statistics extends SmartView {
   constructor(films) {
     super();
     this._data = films;
-
+    this._sortGenres = null;
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
 
@@ -133,7 +134,7 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._data, this._getWatchedFilms());
+    return createStatisticsTemplate(this._getWatchedFilms(), this._sortGenres);
   }
 
   restoreHandlers() {
@@ -157,7 +158,10 @@ export default class Statistics extends SmartView {
 
   setCharts() {
     const statisticCtx = document.querySelector('.statistic__chart');
-    createFilmsChart(statisticCtx);
+    const genresByFilms = getNumbeFilmsByGenre(this._data);
+    this._sortGenres = getSortGenresFilms(genresByFilms);
+    createFilmsChart(statisticCtx, this._sortGenres);
+    // обновить страницу
   }
 
 }
