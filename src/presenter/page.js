@@ -170,8 +170,7 @@ export default class Page {
     const filmsCount = this._getFilms().length;
     const newRenderedCount = Math.min(filmsCount, this._renderedCount + COUNT_PER_STEP);
     const films = this._getFilms().slice(this._renderedCount, newRenderedCount);
-    const comments = this._comments.slice(this._renderedCount, newRenderedCount);
-    this._renderFilms(this._filmListContainer, films, this._renderFilm, comments);
+    this._renderFilms(this._filmListContainer, films, this._renderFilm, this._comments);
     this._renderedCount = newRenderedCount;
 
     if (this._renderedCount >= filmsCount) {

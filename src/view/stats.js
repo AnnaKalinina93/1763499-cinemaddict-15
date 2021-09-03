@@ -2,9 +2,18 @@ import SmartView from './smart.js';
 import { filter } from '../utils/filters.js';
 import { FilterType } from '../const.js';
 import dayjs from 'dayjs';
+import { completedFimsInDateRange } from '../day.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { getNumbeFilmsByGenre, getSortGenresFilms } from '../utils/filters.js';
+const CurrentType = {
+  All: 'allTime',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};
+
 
 const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
@@ -69,8 +78,19 @@ const createFilmsChart = (statisticCtx, genresByFilms) => {
     },
   });
 };
-const createStatisticsTemplate = (watchedFilms, sortGenres) => {
-  const totalDuration = watchedFilms.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b);
+const createStatisticsTemplate = (data) => {
+  let films = [];
+  let currentType = null;
+  let genres = null;
+  let totalDuration = 0;
+  let genresArray = [];
+  if (data) {
+    films = data.films;
+    currentType = data.currentType;
+    genres = data.genres;
+    totalDuration = films.length !== 0 ? films.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b) : 0;
+    genresArray = genres ? Object.keys(genres) : null;
+  }
   return `<section class="statistic">
     <p class="statistic__rank">
       Your rank
@@ -81,26 +101,26 @@ const createStatisticsTemplate = (watchedFilms, sortGenres) => {
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="all-time" checked>
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-all-time" value="allTime" ${currentType === CurrentType.All ? 'checked' : ''}>
       <label for="statistic-all-time" class="statistic__filters-label">All time</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-today" value="today" ${currentType === CurrentType.TODAY ? 'checked' : ''}>
       <label for="statistic-today" class="statistic__filters-label">Today</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-week" value="week" ${currentType === CurrentType.WEEK ? 'checked' : ''}>
       <label for="statistic-week" class="statistic__filters-label">Week</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-month" value="month" ${currentType === CurrentType.MONTH ? 'checked' : ''}>
       <label for="statistic-month" class="statistic__filters-label">Month</label>
 
-      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year">
+      <input type="radio" class="statistic__filters-input visually-hidden" name="statistic-filter" id="statistic-year" value="year" ${currentType === CurrentType.YEAR ? 'checked' : ''}>
       <label for="statistic-year" class="statistic__filters-label">Year</label>
     </form>
 
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">${watchedFilms.length} <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${films.length} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
@@ -108,7 +128,7 @@ const createStatisticsTemplate = (watchedFilms, sortGenres) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${sortGenres === null ? '' : Object.keys(sortGenres)[0]}</p>
+        <p class="statistic__item-text">${genresArray.length !== 0 ? genresArray[0] : ''}</p>
       </li>
     </ul>
 
@@ -119,14 +139,31 @@ const createStatisticsTemplate = (watchedFilms, sortGenres) => {
   </section>`;
 };
 export default class Statistics extends SmartView {
-  constructor(films) {
+  constructor() {
     super();
-    this._data = films;
     this._sortGenres = null;
+    this._data = null;
+    this._sortFilms = null;
+    this._chartComponent = null;
+    this._today = dayjs();
+    this._week = dayjs().subtract(7, 'day').toDate();
+    this._lastMonth = dayjs().subtract(1, 'month').toDate();
+    this._lastYear = dayjs().subtract(1, 'year').toDate();
 
     this._dateChangeHandler = this._dateChangeHandler.bind(this);
+  }
 
-
+  init(filmsModel) {
+    this._filmsModel = filmsModel;
+    this._sortGenres = null;
+    this._data = {
+      films: this._filmsModel.getFilms(),
+      currentType: CurrentType.All,
+      genres: this._sortGenres,
+    };
+    this._getWatchedFilms(this._data.films);
+    this._setCharts();
+    this.updateData(this._data);
   }
 
   removeElement() {
@@ -134,34 +171,95 @@ export default class Statistics extends SmartView {
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._getWatchedFilms(), this._sortGenres);
+    return createStatisticsTemplate(this._data);
   }
 
   restoreHandlers() {
     this._setCharts();
   }
 
-  _getWatchedFilms() {
-    return filter[FilterType.HISTORY](this._data);
-  }
-
-  _dateChangeHandler([dateFrom, dateTo]) {
-    if (!dateFrom || !dateTo) {
-      return;
-    }
-
-    this.updateData({
-      dateFrom,
-      dateTo,
-    });
-  }
-
-  setCharts() {
-    const statisticCtx = document.querySelector('.statistic__chart');
-    const genresByFilms = getNumbeFilmsByGenre(this._data);
+  _getWatchedFilms(data) {
+    const films = filter[FilterType.HISTORY](data);
+    const genresByFilms = getNumbeFilmsByGenre(films);
     this._sortGenres = getSortGenresFilms(genresByFilms);
-    createFilmsChart(statisticCtx, this._sortGenres);
-    // обновить страницу
+    this._data = Object.assign({},
+      this._data,
+      {
+        films: films,
+        genres: this._sortGenres,
+      });
   }
 
+  _dateChangeHandler(evt) {
+    evt.preventDefault();
+    switch (evt.target.value) {
+      case CurrentType.All:
+        this._getWatchedFilms(this._filmsModel.getFilms());
+        this.updateData(Object.assign({},
+          this._data,
+          {
+            currentType: CurrentType.All,
+          }));
+        this._setCharts();
+        this.setData();
+        break;
+      case CurrentType.TODAY:
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._today);
+        this._getWatchedFilms(this._sortFilms);
+        this.updateData(Object.assign({}, this._data,
+          {
+            currentType: CurrentType.TODAY,
+          },
+        ));
+        this._setCharts();
+        this.setData();
+        break;
+      case CurrentType.WEEK:
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today);
+        this._getWatchedFilms(this._sortFilms);
+        this.updateData(Object.assign({}, this._data,
+          {
+            currentType: CurrentType.WEEK,
+          },
+        ));
+        this._setCharts();
+        this.setData();
+        break;
+      case CurrentType.MONTH:
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today);
+        this.updateData(Object.assign({}, this._data, {
+          films: this._sortFilms,
+          currentType: CurrentType.MONTH,
+        },
+        ));
+        this._setCharts();
+        this.setData();
+        break;
+      case CurrentType.YEAR:
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._today);
+        this._getWatchedFilms(this._sortFilms);
+        this.updateData(Object.assign({}, this._data,
+          {
+            currentType: CurrentType.YEAR,
+          },
+        ));
+        this._setCharts();
+        this.setData();
+        break;
+    }
+  }
+
+  setData() {
+    document.querySelector('.statistic__filters')
+      .addEventListener('change', this._dateChangeHandler);
+  }
+
+  _setCharts() {
+    if (this._chartComponent !== null) {
+      this._chartComponent = null;
+    }
+    const statisticCtx = document.querySelector('.statistic__chart');
+    if (!statisticCtx) { return; }
+    this._chartComponent = createFilmsChart(statisticCtx, this._sortGenres);
+  }
 }
