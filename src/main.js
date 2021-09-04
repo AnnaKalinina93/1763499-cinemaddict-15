@@ -10,7 +10,7 @@ import { getComments } from './mock/comments.js';
 import StatisticsView from './view/stats.js';
 import { FilterType } from './const.js';
 
-const COUNT = 15;
+const COUNT = 40;
 const films = new Array(COUNT).fill().map(generateData);
 const idComments = films.map((film) => film.comments).flat();
 const commentsArray = [];
