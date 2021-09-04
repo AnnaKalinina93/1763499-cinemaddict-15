@@ -216,7 +216,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.WEEK:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today, 'month day hour');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
