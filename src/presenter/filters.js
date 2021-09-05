@@ -4,7 +4,8 @@ import { filter } from '../utils/filters.js';
 import { FilterType, UpdateType } from '../const.js';
 
 export default class Filter {
-  constructor(filterContainer, filterModel, filmsModel) {
+  constructor(filterContainer, filterModel, filmsModel, handleStatistic) {
+    this._handleStatistic = handleStatistic;
     this._filterContainer = filterContainer;
     this._filterModel = filterModel;
     this._filmsModel = filmsModel;
@@ -39,10 +40,15 @@ export default class Filter {
   }
 
   _handleFilterTypeChange(filterType) {
-    if (this._filterModel.getFilter() === filterType) {
+    if (filterType === FilterType.STATISTICS) {
+      this._filterModel.setFilter(null, filterType);
+      this._handleStatistic(filterType);
       return;
     }
     this._filterModel.setFilter(UpdateType.MAJOR, filterType);
+    this._handleStatistic(filterType);
+
+
   }
 
   _getFilters() {

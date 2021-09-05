@@ -27,4 +27,6 @@ export const FilterType = {
   FAVORITES: 'favorites',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
+  STATISTICS:'statistics',
 };
+
