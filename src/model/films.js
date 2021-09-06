@@ -62,7 +62,7 @@ export default class Films extends AbstractObserver {
       });
 
     // Ненужные ключи мы удаляем
-    delete adaptedFilm['film-info'];
+    delete adaptedFilm['film_info'];
     delete adaptedFilm['user_details'];
 
     return adaptedFilm;

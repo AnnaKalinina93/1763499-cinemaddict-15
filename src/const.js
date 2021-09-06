@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',

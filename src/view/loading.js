@@ -2,9 +2,7 @@ import AbstractView from './abstract.js';
 
 const createNoTaskTemplate = () => (
   `<section class="films-list">
-  <p class="board__no-tasks">
-    Loading...
-  </p>
+  <h2 class="films-list__title">Loading...</h2>
 </section>`
 );
 

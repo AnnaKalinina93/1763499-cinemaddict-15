@@ -1,8 +1,11 @@
 import FilmsModel from './model/films';
+import CommentsModel from './model/comments';
 
 const Method = {
   GET: 'GET',
   PUT: 'PUT',
+  POST: 'POST',
+  DELETE: 'DELETE',
 };
 
 export default class Api {
@@ -17,7 +20,7 @@ export default class Api {
       .then((films) => films.map(FilmsModel.adaptToClient));
   }
 
-  updateFilms(film) {
+  updateFilm(film) {
     return this._load({
       url: `movies/${film.id}`,
       method: Method.PUT,
@@ -42,6 +45,13 @@ export default class Api {
     )
       .then(Api.checkStatus)
       .catch(Api.catchError);
+  }
+
+  getComments(filmId) {
+    return this._load({
+      url: `comments/${filmId}`})
+      .then(Api.toJSON)
+      .then((comments) =>comments.map(CommentsModel.adaptToClient));
   }
 
   static checkStatus(response) {

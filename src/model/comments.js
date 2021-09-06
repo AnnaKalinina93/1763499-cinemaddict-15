@@ -6,8 +6,9 @@ export default class Comments extends AbstractObserver {
     this._comments = [];
   }
 
-  setComments(comments) {
+  setComments(updateType, film, comments) {
     this._comments = comments.slice();
+    this._notify(updateType, film);
   }
 
   getComments() {
@@ -36,5 +37,39 @@ export default class Comments extends AbstractObserver {
     ];
 
     this._notify(updateType, update, this._comments, scroll);
+  }
+
+  static adaptToClient(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        text: comment['comment'],
+        emoji: comment['emotion'],
+        dueDate: comment['date'],
+        avtor: comment['author'],
+      });
+    delete adaptedComment['comment'];
+    delete adaptedComment['emotion'];
+    delete adaptedComment['date'];
+    delete adaptedComment['author'];
+    return adaptedComment;
+  }
+
+  static adaptToServer(comment) {
+    const adaptedComment = Object.assign(
+      {},
+      comment,
+      {
+        'comment': comment.text,
+        'author': comment.avtor,
+        'emotion': comment.emoji,
+        'date': comment.dueDate,
+      });
+    delete adaptedComment.text;
+    delete adaptedComment.dueDate;
+    delete adaptedComment.avtor;
+    delete adaptedComment.emoji;
+    return adaptedComment;
   }
 }
