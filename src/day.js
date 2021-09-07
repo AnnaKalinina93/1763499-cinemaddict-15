@@ -9,8 +9,8 @@ dayjs.extend(isBetween);
 
 
 const generateDate = () => {
-  const maxDaysGap = 7;
-  const yearsGap = getRandomInteger(-50, 0);
+  const maxDaysGap = 20;
+  const yearsGap = getRandomInteger(-2, 0);
   const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
   const hoursGap = getRandomInteger(-12, 12);
   return dayjs().add(daysGap, 'day').add(yearsGap, 'year').add(hoursGap, 'hour').toDate();
