@@ -216,7 +216,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.WEEK:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today, 'month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -227,7 +227,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.MONTH:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today, 'month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._endToday, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -238,7 +238,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.YEAR:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._today, 'year month day');
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._endToday, 'year month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
