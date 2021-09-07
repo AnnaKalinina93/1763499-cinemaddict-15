@@ -27,18 +27,7 @@ const generateRuntime = (time) => {
   return `${hour}h ${minute}m`;
 };
 
-const completedFimsInDateRange = (films, dateFrom, dateTo) => {
-  const correctFilms = [];
-  films.forEach((film) => {
-    if (
-      dayjs(film.userDetails.watchingDate).isSame(dateFrom) ||
-      dayjs(film.userDetails.watchingDate).isBetween(dateFrom, dateTo) ||
-      dayjs(film.userDetails.watchingDate).isSame(dateTo)
-    ) {
-      correctFilms.push(film);
-    }
-  });
-  return correctFilms;
-};
+const completedFimsInDateRange = (films, dateFrom, dateTo, format) =>
+  films.filter((film) => dayjs(film.userDetails.watchingDate).isBetween(dateFrom, dateTo, format, '[)'));
 
 export { generateDate, getDayMonthFormat, getYearsFormat, getTimeFormat, generateRuntime, completedFimsInDateRange };

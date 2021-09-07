@@ -145,7 +145,8 @@ export default class Statistics extends SmartView {
     this._data = null;
     this._sortFilms = null;
     this._chartComponent = null;
-    this._today = dayjs();
+    this._today = dayjs().startOf('day');
+    this._endToday = dayjs().endOf('day');
     this._week = dayjs().subtract(7, 'day').toDate();
     this._lastMonth = dayjs().subtract(1, 'month').toDate();
     this._lastYear = dayjs().subtract(1, 'year').toDate();
@@ -204,7 +205,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.TODAY:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._today);
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._today, this._endToday, 'hour minute');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -215,7 +216,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.WEEK:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today);
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._week, this._today, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -226,7 +227,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.MONTH:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today);
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today, 'month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {
@@ -237,7 +238,7 @@ export default class Statistics extends SmartView {
         this.setData();
         break;
       case CurrentType.YEAR:
-        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._today);
+        this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastYear, this._today, 'year month day');
         this._getWatchedFilms(this._sortFilms);
         this.updateData(Object.assign({}, this._data,
           {

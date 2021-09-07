@@ -50,8 +50,6 @@ export default class Film {
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this._filmListElement, this._filmComponent, InsertPlace.BEFORE_END);
-      //this._getCommentsFilm(film);
-
       return;
     }
 
