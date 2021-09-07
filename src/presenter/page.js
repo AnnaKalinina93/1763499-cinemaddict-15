@@ -31,7 +31,7 @@ export default class Page {
     this._filmListContainer = new FilmListContainerView;
     this._topNameElement = new AdditionalContainerView(TOP_NAME);
     this._commentedNameElement = new AdditionalContainerView(MOST_COMMENTED_NAME);
-    this._loadingComponent = new LoadingView();
+    //this._loadingComponent = new LoadingView();
     this._showMoreButton = null;
     this._scrollPosition = null;
     this._filterModel = filterModel;
@@ -53,7 +53,7 @@ export default class Page {
   }
 
   init() {
-    this._getComments();
+    // this._getComments();
     this._renderPage();
 
     this._filmsModel.addObserver(this._handleModelEvent);
@@ -61,9 +61,9 @@ export default class Page {
     this._commentsModel.addObserver(this._handleModelEvent);
   }
 
-  _getComments() {
-    this._comments = this._commentsModel.getComments();
-  }
+  // _getComments() {
+  //   this._comments = this._commentsModel.getComments();
+  // }
 
   _getFilms() {
     this._filterType = this._filterModel.getFilter();
@@ -153,7 +153,8 @@ export default class Page {
   }
 
   _renderLoading() {
-    render(this._filmsContainer, this._loadingComponent, InsertPlace.BEFORE_END);
+    this._loadingComponent = new LoadingView();
+    render(this._siteElement, this._loadingComponent, InsertPlace.BEFORE_END);
   }
 
   _renderFilm(filmListElement, film) {

@@ -227,10 +227,11 @@ export default class Statistics extends SmartView {
         break;
       case CurrentType.MONTH:
         this._sortFilms = completedFimsInDateRange(this._filmsModel.getFilms(), this._lastMonth, this._today);
-        this.updateData(Object.assign({}, this._data, {
-          films: this._sortFilms,
-          currentType: CurrentType.MONTH,
-        },
+        this._getWatchedFilms(this._sortFilms);
+        this.updateData(Object.assign({}, this._data,
+          {
+            currentType: CurrentType.MONTH,
+          },
         ));
         this._setCharts();
         this.setData();

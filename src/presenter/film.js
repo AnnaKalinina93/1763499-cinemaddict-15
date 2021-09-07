@@ -50,7 +50,7 @@ export default class Film {
 
     if (prevFilmComponent === null || prevPopupComponent === null) {
       render(this._filmListElement, this._filmComponent, InsertPlace.BEFORE_END);
-      this._getCommentsFilm(film);
+      //this._getCommentsFilm(film);
 
       return;
     }
@@ -162,7 +162,7 @@ export default class Film {
       document.querySelector('.film-details').remove();
     }
     render(this._siteBodyElement, this._popupComponent, InsertPlace.BEFORE_END);
-
+    this._getCommentsFilm(this._film);
     this._mode = Mode.POPUP;
     this._changeMode();
 
