@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 export const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
@@ -15,6 +16,7 @@ export const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT',
 };
 
 export const Mode = {

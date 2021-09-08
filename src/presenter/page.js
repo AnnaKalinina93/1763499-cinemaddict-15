@@ -6,6 +6,7 @@ import AdditionalContainerView from '../view/additional-container.js';
 import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
 import SiteSortView from '../view/sort.js';
+import LoadingView from '../view/loading.js';
 import { render, InsertPlace, remove, replace } from '../utils/render.js';
 import { topSortFunction, commentedSortFunction, sortFilmRating, sortFilmDate } from '../utils/sort.js';
 import FilmPresenter from './film.js';
@@ -17,17 +18,20 @@ const TOP_NAME = 'Top rated';
 const MOST_COMMENTED_NAME = 'Most commented';
 
 export default class Page {
-  constructor(siteElement, filmsModel, filterModel, commentsModel) {
+  constructor(siteElement, filmsModel, filterModel, commentsModel, api) {
     this._siteElement = siteElement;
     this._filmsModel = filmsModel;
     this._commentsModel = commentsModel;
-    this._comments = null;
+    this._isLoading = true;
     this._renderedCount = COUNT_PER_STEP;
+    this._comments = [];
+    this._api = api;
     this._filmsContainer = new SiteFilmsContainerView();
     this._nameFilmListElement = new NameFilmListView();
     this._filmListContainer = new FilmListContainerView;
     this._topNameElement = new AdditionalContainerView(TOP_NAME);
     this._commentedNameElement = new AdditionalContainerView(MOST_COMMENTED_NAME);
+    //this._loadingComponent = new LoadingView();
     this._showMoreButton = null;
     this._scrollPosition = null;
     this._filterModel = filterModel;
@@ -40,7 +44,6 @@ export default class Page {
     this._filmPresenter = new Map();
     this._topFilmPresenter = new Map();
     this._commentedFilmPresenter = new Map();
-
     this._handleShowMoreButtonClick = this._handleShowMoreButtonClick.bind(this);
     this._handleModeChange = this._handleModeChange.bind(this);
     this._handleSortTypeChange = this._handleSortTypeChange.bind(this);
@@ -50,7 +53,7 @@ export default class Page {
   }
 
   init() {
-    this._getComments();
+    // this._getComments();
     this._renderPage();
 
     this._filmsModel.addObserver(this._handleModelEvent);
@@ -58,9 +61,9 @@ export default class Page {
     this._commentsModel.addObserver(this._handleModelEvent);
   }
 
-  _getComments() {
-    this._comments = this._commentsModel.getComments();
-  }
+  // _getComments() {
+  //   this._comments = this._commentsModel.getComments();
+  // }
 
   _getFilms() {
     this._filterType = this._filterModel.getFilter();
@@ -105,7 +108,10 @@ export default class Page {
   _handleViewAction(actionType, updateType, update, comments, scrollPosition) {
     switch (actionType) {
       case UserAction.UPDATE_FILM:
-        this._filmsModel.updateFilm(updateType, update, comments, scrollPosition);
+        this._api.updateFilm(update).then((response) => {
+          this._filmsModel.updateFilm(updateType, response, comments, scrollPosition);
+        });
+        // this._filmsModel.updateFilm(updateType, update, comments, scrollPosition);
         break;
       case UserAction.ADD_COMMENTS:
         this._commentsModel.addComment(updateType, update, comments, scrollPosition);
@@ -119,12 +125,14 @@ export default class Page {
   _handleModelEvent(updateType, data, comments, scrollPosition) {
     switch (updateType) {
       case UpdateType.PATCH:
-        this._filmPresenter.get(data.id).init(data, comments, scrollPosition);
+        if (this._filmPresenter.get(data.id)) {
+          this._filmPresenter.get(data.id).init(data, scrollPosition);
+        }
         if (this._topFilmPresenter.get(data.id)) {
-          this._topFilmPresenter.get(data.id).init(data, comments, scrollPosition);
+          this._topFilmPresenter.get(data.id).init(data, scrollPosition);
         }
         if (this._commentedFilmPresenter.get(data.id)) {
-          this._commentedFilmPresenter.get(data.id).init(data, comments, scrollPosition);
+          this._commentedFilmPresenter.get(data.id).init(data, scrollPosition);
         }
         break;
       case UpdateType.MINOR:
@@ -135,30 +143,41 @@ export default class Page {
         this._clearPage({ resetRenderedFilmsCount: true, resetSortType: true });
         this._renderPage();
         break;
+      case UpdateType.INIT:
+        this._isLoading = false;
+
+        remove(this._loadingComponent);
+        this._renderPage();
+        break;
     }
   }
 
-  _renderFilm(filmListElement, film, comments) {
-    const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType);
-    filmPresenter.init(film, comments, this._scrollPosition);
+  _renderLoading() {
+    this._loadingComponent = new LoadingView();
+    render(this._siteElement, this._loadingComponent, InsertPlace.BEFORE_END);
+  }
+
+  _renderFilm(filmListElement, film) {
+    const filmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._api, this._commentsModel);
+    filmPresenter.init(film, this._scrollPosition);
     this._filmPresenter.set(film.id, filmPresenter);
   }
 
-  _renderTopFilm(filmListElement, film, comments) {
-    const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    topFilmPresenter.init(film, comments, this._scrollPosition);
+  _renderTopFilm(filmListElement, film) {
+    const topFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._api, this._commentsModel);
+    topFilmPresenter.init(film, this._scrollPosition);
     this._topFilmPresenter.set(film.id, topFilmPresenter);
   }
 
-  _renderCommentedFilm(filmListElement, film, comments) {
-    const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._comments);
-    commentedFilmPresenter.init(film, comments, this._scrollPosition);
+  _renderCommentedFilm(filmListElement, film) {
+    const commentedFilmPresenter = new FilmPresenter(filmListElement, this._handleViewAction, this._handleModeChange, this._filterType, this._api, this._commentsModel);
+    commentedFilmPresenter.init(film, this._scrollPosition);
     this._commentedFilmPresenter.set(film.id, commentedFilmPresenter);
   }
 
-  _renderFilms(siteElement, films, cb, comments) {
+  _renderFilms(siteElement, films, cb) {
     this._cb = cb;
-    films.forEach((film) => this._cb(siteElement, film, comments));
+    films.forEach((film) => this._cb(siteElement, film));
   }
 
   _renderNoFilm() {
@@ -216,6 +235,10 @@ export default class Page {
   }
 
   _renderPage() {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
     this._renderSortFilms();
     render(this._siteElement, this._filmsContainer, InsertPlace.BEFORE_END);
     const films = this._getFilms();
@@ -225,7 +248,7 @@ export default class Page {
     } else {
       render(this._filmsContainer, this._nameFilmListElement, InsertPlace.BEFORE_END);
       render(this._nameFilmListElement, this._filmListContainer, InsertPlace.BEFORE_END);
-      this._renderFilms(this._filmListContainer, films.slice(0, Math.min(filmsCount, this._renderedCount)), this._renderFilm, this._comments);
+      this._renderFilms(this._filmListContainer, films.slice(0, Math.min(filmsCount, this._renderedCount)), this._renderFilm);
       if (filmsCount > this._renderedCount) {
         this._renderShowMoreButton();
       }
@@ -255,6 +278,7 @@ export default class Page {
     if (this._noFilmsComponent) {
       remove(this._noFilmsComponent);
     }
+    remove(this._loadingComponent);
     remove(this._showMoreButton);
     remove(this._numbersFilms);
     remove(this._topNameElement);
@@ -277,12 +301,12 @@ export default class Page {
     this._filmsContainer.hide();
     this._nameFilmListElement.hide();
     this._filmListContainer.hide();
-    this._filmPresenter.forEach((item)=> item._filmComponent.hide());
+    this._filmPresenter.forEach((item) => item._filmComponent.hide());
     this._topNameElement.hide();
     this._commentedNameElement.hide();
     this._showMoreButton.hide();
-    this._topFilmPresenter.forEach((item)=> item._filmComponent.hide());
-    this._commentedFilmPresenter.forEach((item)=>  item._filmComponent.hide());
+    this._topFilmPresenter.forEach((item) => item._filmComponent.hide());
+    this._commentedFilmPresenter.forEach((item) => item._filmComponent.hide());
   }
 
   show() {
@@ -290,12 +314,12 @@ export default class Page {
     this._filmsContainer.show();
     this._nameFilmListElement.show();
     this._filmListContainer.show();
-    this._filmPresenter.forEach((item)=> item._filmComponent.show());
+    this._filmPresenter.forEach((item) => item._filmComponent.show());
     this._topNameElement.show();
     this._commentedNameElement.show();
     this._showMoreButton.show();
-    this._topFilmPresenter.forEach((item)=> item._filmComponent.show());
-    this._commentedFilmPresenter.forEach((item)=>  item._filmComponent.show());
+    this._topFilmPresenter.forEach((item) => item._filmComponent.show());
+    this._commentedFilmPresenter.forEach((item) => item._filmComponent.show());
 
   }
 }

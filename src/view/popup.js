@@ -10,13 +10,13 @@ import he from 'he';
 const createCommentTemplate = (comment) => (
   ` <li class="film-details__comment">
           <span class="film-details__comment-emoji">
-            <img src=${comment.emoji} width="55" height="55" alt="emoji-smile">
+            <img src="images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-smile">
           </span>
           <div>
             <p class="film-details__comment-text">${he.encode(comment.text)}</p>
             <p class="film-details__comment-info" >
               <span class="film-details__comment-author">${comment.avtor}</span>
-              <span class="film-details__comment-day">${comment.dueDate}</span>
+              <span class="film-details__comment-day">${getDayMonthFormat(comment.dueDate)} ${getTimeFormat(comment.dueDate)}</span>
               <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
             </p>
           </div>

@@ -4,16 +4,18 @@ import PopupView from '../view/popup.js';
 import { UserAction, UpdateType, Mode, FilterType } from '../const.js';
 
 export default class Film {
-  constructor(filmListElement, changeData, changeMode, filterType) {
+  constructor(filmListElement, changeData, changeMode, filterType, api, commentsModel) {
     this._filmListElement = filmListElement;
     this._changeData = changeData;
     this._changeMode = changeMode;
+    this._api = api;
+    this._commentsModel = commentsModel;
     this._filmComponent = null;
     this._popupComponent = null;
     this._siteBodyElement = document.querySelector('body');
     this._mode = Mode.DEFAULT;
     this._filterType = filterType;
-
+    this._comments = [];
 
     this._handleOpenClick = this._handleOpenClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
@@ -24,11 +26,10 @@ export default class Film {
 
   }
 
-  init(film, comments, scrollPosition) {
+  init(film, scrollPosition) {
     this._film = film;
-    this._comments = comments;
     this._scrollPosition = scrollPosition;
-    this._comments = this._getCommentsFilm(this._film);
+    this._comments = this._commentsModel.getComments();
 
     const prevFilmComponent = this._filmComponent;
     const prevPopupComponent = this._popupComponent;
@@ -68,8 +69,14 @@ export default class Film {
   }
 
   _getCommentsFilm(film) {
-    const commentsIds = film.comments;
-    return this._comments.filter((comment) => commentsIds.includes(comment.id));
+    this._api.getComments(film.id)
+      .then((comments) => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, comments);
+      })
+      .catch(() => {
+        this._commentsModel.setComments(UpdateType.PATCH, film, []);
+      });
+
   }
 
   destroy() {
@@ -153,7 +160,7 @@ export default class Film {
       document.querySelector('.film-details').remove();
     }
     render(this._siteBodyElement, this._popupComponent, InsertPlace.BEFORE_END);
-
+    this._getCommentsFilm(this._film);
     this._mode = Mode.POPUP;
     this._changeMode();
 
@@ -163,7 +170,7 @@ export default class Film {
 
     this._siteBodyElement.classList.remove('hide-overflow');
     this._changeData(UserAction.UPDATE_FILM,
-      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
+      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR, this._film, this._comments, this._scrollPosition);
     this._popupComponent.getElement().remove();
 
     this._mode = Mode.DEFAULT;
