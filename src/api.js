@@ -15,7 +15,7 @@ export default class Api {
   }
 
   getFilms() {
-    return this._load({url: 'movies'})
+    return this._load({ url: 'movies' })
       .then(Api.toJSON)
       .then((films) => films.map(FilmsModel.adaptToClient));
   }
@@ -25,7 +25,7 @@ export default class Api {
       url: `movies/${film.id}`,
       method: Method.PUT,
       body: JSON.stringify(FilmsModel.adaptToServer(film)),
-      headers: new Headers({'Content-Type': 'application/json'}),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
     })
       .then(Api.toJSON)
       .then(FilmsModel.adaptToClient);
@@ -41,7 +41,7 @@ export default class Api {
 
     return fetch(
       `${this._endPoint}/${url}`,
-      {method, body, headers},
+      { method, body, headers },
     )
       .then(Api.checkStatus)
       .catch(Api.catchError);
@@ -49,9 +49,10 @@ export default class Api {
 
   getComments(filmId) {
     return this._load({
-      url: `comments/${filmId}`})
+      url: `comments/${filmId}`,
+    })
       .then(Api.toJSON)
-      .then((comments) =>comments.map(CommentsModel.adaptToClient));
+      .then((comments) => comments.map(CommentsModel.adaptToClient));
   }
 
   static checkStatus(response) {
@@ -60,6 +61,31 @@ export default class Api {
     }
 
     return response;
+  }
+
+  addComment(film, comment) {
+    return this._load({
+      url: `comments/${film.id}`,
+      method: Method.POST,
+      body: JSON.stringify(CommentsModel.adaptToServer(comment)),
+      headers: new Headers({ 'Content-Type': 'application/json' }),
+    })
+      .then(Api.toJSON)
+      .then((data) => {
+        const newFilm = FilmsModel.adaptToClient(data.movie);
+        const newComments =data.comments.map(CommentsModel.adaptToClient);
+        return {
+          film: newFilm,
+          comment: newComments,
+        };
+      });
+  }
+
+  deleteComment(comment) {
+    return this._load({
+      url: `comments/${comment.id}`,
+      method: Method.DELETE,
+    });
   }
 
   static toJSON(response) {
