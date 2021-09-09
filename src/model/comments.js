@@ -62,13 +62,9 @@ export default class Comments extends AbstractObserver {
       comment,
       {
         'comment': comment.text,
-        'author': comment.avtor,
         'emotion': comment.emoji,
-        'date': comment.dueDate,
       });
     delete adaptedComment.text;
-    delete adaptedComment.dueDate;
-    delete adaptedComment.avtor;
     delete adaptedComment.emoji;
     return adaptedComment;
   }

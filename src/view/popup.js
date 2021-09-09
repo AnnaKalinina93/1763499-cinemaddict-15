@@ -1,13 +1,10 @@
 import { getDayMonthFormat, getYearsFormat, getTimeFormat } from '../day.js';
 import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
-import dayjs from 'dayjs';
 import { UpdateType, UserAction } from '../const.js';
-//import { isEscape } from '../utils/render.js';
-import { nanoid } from 'nanoid';
 import he from 'he';
 
-const createCommentTemplate = (comment) => (
+const createCommentTemplate = (comment, deletingId) => (
   ` <li class="film-details__comment">
           <span class="film-details__comment-emoji">
             <img src="images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-smile">
@@ -17,24 +14,24 @@ const createCommentTemplate = (comment) => (
             <p class="film-details__comment-info" >
               <span class="film-details__comment-author">${comment.avtor}</span>
               <span class="film-details__comment-day">${getDayMonthFormat(comment.dueDate)} ${getTimeFormat(comment.dueDate)}</span>
-              <button class="film-details__comment-delete" id=${comment.id}>Delete</button>
+              <button class="film-details__comment-delete" id=${comment.id}> ${deletingId === comment.id ? 'Deleting...' : 'Delete'}</button>
             </p>
           </div>
         </li>`
 );
 
-const createCommentsTemplate = (comments) => (
+const createCommentsTemplate = (comments, deletingId) => (
   `<ul class="film-details__comments-list" style="font-size:0" >
-  ${comments.map((comment) => createCommentTemplate(comment))}
+  ${comments.map((comment) => createCommentTemplate(comment, deletingId))}
   </ul>`
 );
 
 const createEmojiTemplate = (newComment) => (
-  ` <img src=${newComment.emoji} width="55" height="55" alt="emoji-smile">`
+  ` <img src="images/emoji/${newComment.emoji}.png" width="55" height="55" alt="emoji-smile">`
 );
 
-const createNewCommentTemplate = (newComment) => (
-  ` <div class="film-details__new-comment">
+const createNewCommentTemplate = (newComment, isDisabled) => (
+  ` <div class="film-details__new-comment  ${isDisabled ? 'disabled' : ''}">
   <div class="film-details__add-emoji-label">${newComment.emoji ? createEmojiTemplate(newComment) : ''}</div>
 
   <label class="film-details__comment-label">
@@ -90,6 +87,8 @@ const createPopupTemplate = (data, newComment, correctComments) => {
       alreadyWatched,
       favorite,
     },
+    isDisabled,
+    deletingId,
   } = data;
 
   const watchlistClassName = watchlist
@@ -176,18 +175,19 @@ const createPopupTemplate = (data, newComment, correctComments) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-      ${isComments ? createCommentsTemplate(correctComments) : ''}
-      ${createNewCommentTemplate(newComment)}
+      ${isComments ? createCommentsTemplate(correctComments, deletingId) : ''}
+      ${createNewCommentTemplate(newComment, isDisabled)}
       </section>
     </div>
   </form>
 </section>`;
 };
 export default class Popup extends SmartView {
-  constructor(film, changeData, comments, scroll, saveScroll) {
+  constructor(film, changeData, comments, scroll, saveScroll, api) {
     super();
     this._comments = comments;
     this._scrollPosition = scroll;
+    this._api = api;
     this._data = Popup.parseFilmToData(film);
     this._newComment = {};
     this._changeData = changeData;
@@ -269,6 +269,8 @@ export default class Popup extends SmartView {
       film,
       {
         isComments: film.comments.length !== 0,
+        isDisabled: false,
+        deletingId: null,
       },
     );
   }
@@ -283,7 +285,8 @@ export default class Popup extends SmartView {
     }
 
     delete data.isComments;
-
+    delete data.isDisabled;
+    delete data.deletingId;
     return data;
   }
 
@@ -352,7 +355,7 @@ export default class Popup extends SmartView {
         {},
         this._newComment,
         {
-          emoji: `images/emoji/${evt.target.value}.png`,
+          emoji: evt.target.value,
         },
       ));
     this.getElement().scrollTop = this._scrollPosition;
@@ -365,49 +368,66 @@ export default class Popup extends SmartView {
       evt.preventDefault();
       if (this._newComment.emoji || this._newComment.text) {
         //   this._scrollPosition = this.getElement().scrollTop;
-        this._createNewCooment();
-        const comments = this._data.comments;
-        comments[comments.length] = this._newComment.id;
-        this._data = Popup.parseDataToFilm(this._data);
-        this._changeData(UserAction.ADD_COMMENTS, UpdateType.PATCH, this._data, this._newComment, this._scrollPosition);
+        this.updateData({
+          isDisabled: true,
+          deletingId: null,
+        });
+
+        this._api.addComment(this._data, this._newComment)
+          .then((response) => {
+            this._data = Popup.parseDataToFilm(this._data);
+            this._changeData(UserAction.ADD_COMMENTS, UpdateType.PATCH, response.film, response.comment[response.comment.length - 1], this._scrollPosition);
+          })
+          .catch(() => {
+            const resetDisabled = () => this.updateData({
+              isDisabled: false,
+              deletingId: null,
+            });
+            const newCommentsElement = this.getElement().querySelector('.film-details__new-comment');
+            this.shake(newCommentsElement, resetDisabled);
+
+          });
         this._newComment = {};
       }
     }
   }
 
-  _createNewCooment() {
-    const dueDate = dayjs();
-    this._updateNewComment(
-      Object.assign(
-        {},
-        this._newComment,
-        {
-          id: nanoid(),
-          avtor: 'Anna',
-          dueDate: `${getDayMonthFormat(dueDate)} ${getTimeFormat(dueDate)}`,
-        },
-      ), true);
-  }
   // удаляем комментарии
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
     //this._scrollPosition = this.getElement().scrollTop;
     const comments = this._delete(this._data.comments, evt.target.id);
-    this._data = Popup.parseDataToFilm(this._data);
     const index = this._comments.findIndex((comment) => comment.id === evt.target.id);
-    this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index], this._scrollPosition);
-    this._changeData(
-      UserAction.UPDATE_FILM,
-      UpdateType.PATCH,
-      Object.assign(
-        {},
-        this._data,
-        {
-          comments: comments,
-        },
-      ), this._comments, this._scrollPosition);
+    this.updateData({
+      isDisabled: false,
+      deletingId: evt.target.id,
+    });
 
+    this._api.deleteComment(this._comments[index])
+      .then(() => {
+        this._data = Popup.parseDataToFilm(this._data);
+        this._changeData(UserAction.DELETE_COMMENTS, UpdateType.PATCH, this._data, this._comments[index], this._scrollPosition);
+        this._changeData(
+          UserAction.UPDATE_FILM,
+          UpdateType.PATCH,
+          Object.assign(
+            {},
+            this._data,
+            {
+              comments: comments,
+            },
+          ), this._comments, this._scrollPosition);
+
+      })
+      .catch(() => {
+        const resetDisabled = () => this.updateData({
+          isDisabled: false,
+          deletingId: null,
+        });
+        const commentsElement = this.getElement().querySelector('.film-details__comments-list');
+        this.shake(commentsElement, resetDisabled);
+      });
   }
 
   _delete(comments, update) {
