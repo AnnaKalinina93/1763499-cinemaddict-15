@@ -35,7 +35,7 @@ export default class Film {
     const prevPopupComponent = this._popupComponent;
 
     this._filmComponent = new FilmView(this._film);
-    this._popupComponent = new PopupView(this._film, this._changeData, this._comments, this._scrollPosition, this._saveScroll, this._api);
+    this._popupComponent = new PopupView(this._film, this._changeData, this._comments, this._api);
 
 
     this._filmComponent.setClickHandler(this._handleOpenClick);
@@ -60,7 +60,7 @@ export default class Film {
     if (this._siteBodyElement.contains((prevPopupComponent.getElement())) && this._mode === Mode.POPUP) {
       replace(this._popupComponent, prevPopupComponent);
       replace(this._filmComponent, prevFilmComponent);
-      this._siteBodyElement.scroll(0, this._scrollPosition);
+      this._popupComponent.getElement().scrollTo(0, this._scrollPosition);
     }
 
     remove(prevFilmComponent);
@@ -90,7 +90,7 @@ export default class Film {
     }
   }
 
-  _handleFavoriteClick() {
+  _handleFavoriteClick(scroll) {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
@@ -103,12 +103,11 @@ export default class Film {
             favorite: !this._film.userDetails.favorite,
           },
         },
-      ), this._comments, this._scrollPosition,
+      ), this._comments, scroll,
     );
-    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
-  _handleWatchlistClick() {
+  _handleWatchlistClick(scroll) {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.WATCHLIST ? UpdateType.PATCH : UpdateType.MINOR,
@@ -121,12 +120,11 @@ export default class Film {
             watchlist: !this._film.userDetails.watchlist,
           },
         },
-      ), this._comments, this._scrollPosition,
+      ), this._comments, scroll,
     );
-    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
-  _handleAlreadyWatchedClick() {
+  _handleAlreadyWatchedClick(scroll) {
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,
@@ -139,9 +137,8 @@ export default class Film {
             alreadyWatched: !this._film.userDetails.alreadyWatched,
           },
         },
-      ), this._comments, this._scrollPosition,
+      ), this._comments, scroll,
     );
-    this._siteBodyElement.scrollTop = this._scrollPosition;
   }
 
   _handleOpenClick() {
@@ -189,10 +186,6 @@ export default class Film {
     this._popupComponent.setFavoriteClickHandler(this._handleFavoriteClick);
     this._popupComponent.setWatchlistClickHandler(this._handleWatchlistClick);
     this._popupComponent.setAlreadyWatchedClickHandler(this._handleAlreadyWatchedClick);
-  }
-
-  _saveScroll(scrollPosition) {
-    this._scrollPosition = scrollPosition;
   }
 
 }

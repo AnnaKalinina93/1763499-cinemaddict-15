@@ -31,7 +31,6 @@ export default class Page {
     this._filmListContainer = new FilmListContainerView;
     this._topNameElement = new AdditionalContainerView(TOP_NAME);
     this._commentedNameElement = new AdditionalContainerView(MOST_COMMENTED_NAME);
-    //this._loadingComponent = new LoadingView();
     this._showMoreButton = null;
     this._scrollPosition = null;
     this._filterModel = filterModel;
@@ -53,17 +52,12 @@ export default class Page {
   }
 
   init() {
-    // this._getComments();
     this._renderPage();
 
     this._filmsModel.addObserver(this._handleModelEvent);
     this._filterModel.addObserver(this._handleModelEvent);
     this._commentsModel.addObserver(this._handleModelEvent);
   }
-
-  // _getComments() {
-  //   this._comments = this._commentsModel.getComments();
-  // }
 
   _getFilms() {
     this._filterType = this._filterModel.getFilter();
@@ -111,7 +105,6 @@ export default class Page {
         this._api.updateFilm(update).then((response) => {
           this._filmsModel.updateFilm(updateType, response, comments, scrollPosition);
         });
-        // this._filmsModel.updateFilm(updateType, update, comments, scrollPosition);
         break;
       case UserAction.ADD_COMMENTS:
         this._commentsModel.addComment(updateType, update, comments, scrollPosition);

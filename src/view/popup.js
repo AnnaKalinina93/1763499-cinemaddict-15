@@ -183,15 +183,13 @@ const createPopupTemplate = (data, newComment, correctComments) => {
 </section>`;
 };
 export default class Popup extends SmartView {
-  constructor(film, changeData, comments, scroll, saveScroll, api) {
+  constructor(film, changeData, comments, api) {
     super();
     this._comments = comments;
-    this._scrollPosition = scroll;
     this._api = api;
     this._data = Popup.parseFilmToData(film);
     this._newComment = {};
     this._changeData = changeData;
-    this._saveScroll = saveScroll;
     this._clickHandler = this._clickHandler.bind(this);
     this._favoriteClickHandler = this._favoriteClickHandler.bind(this);
     this._watchlistClickHandler = this._watchlistClickHandler.bind(this);
@@ -200,7 +198,6 @@ export default class Popup extends SmartView {
     this._emojiHandler = this._emojiHandler.bind(this);
     this._sendCommentHandler = this._sendCommentHandler.bind(this);
     this._deleteCommentHandlers = this._deleteCommentHandlers.bind(this);
-    this._scrollHandler = this._scrollHandler.bind(this);
     this._setInnerHandlers();
   }
 
@@ -221,24 +218,21 @@ export default class Popup extends SmartView {
   }
 
   _favoriteClickHandler(evt) {
-    //this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.favoriteClick();
+    this._scrollPosition = this.getElement().scrollTop;
+    this._callback.favoriteClick(this._scrollPosition);
   }
 
   _watchlistClickHandler(evt) {
-    //this._scrollPosition = this.getElement().scrollTop;
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.watchlistClick();
+    this._callback.watchlistClick(this._scrollPosition);
   }
 
   _alreadyWatchedClickHandler(evt) {
-    // this._scrollPosition = this.getElement().scrollTop;
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
-    this._saveScroll(this._scrollPosition);
-    this._callback.alreadyWatchedClick();
+    this._callback.alreadyWatchedClick(this._scrollPosition);
   }
 
   setFavoriteClickHandler(callback) {
@@ -314,7 +308,7 @@ export default class Popup extends SmartView {
     document.addEventListener('keydown', this._sendCommentHandler);
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
-    this.getElement().addEventListener('scroll', this._scrollHandler);
+    //this.getElement().addEventListener('scroll', this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -340,7 +334,7 @@ export default class Popup extends SmartView {
   }
 
   _emojiHandler(evt) {
-    // this._scrollPosition = this.getElement().scrollTop;
+    this._scrollPosition = this.getElement().scrollTop;
     evt.preventDefault();
     this.updateData(
       Object.assign(
@@ -367,12 +361,12 @@ export default class Popup extends SmartView {
     if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
       if (this._newComment.emoji || this._newComment.text) {
-        //   this._scrollPosition = this.getElement().scrollTop;
+        this._scrollPosition = this.getElement().scrollTop;
         this.updateData({
           isDisabled: true,
           deletingId: null,
         });
-
+        this.getElement().scrollTop = this._scrollPosition;
         this._api.addComment(this._data, this._newComment)
           .then((response) => {
             this._data = Popup.parseDataToFilm(this._data);
@@ -396,14 +390,14 @@ export default class Popup extends SmartView {
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();
-    //this._scrollPosition = this.getElement().scrollTop;
+    this._scrollPosition = this.getElement().scrollTop;
     const comments = this._delete(this._data.comments, evt.target.id);
     const index = this._comments.findIndex((comment) => comment.id === evt.target.id);
     this.updateData({
       isDisabled: false,
       deletingId: evt.target.id,
     });
-
+    this.getElement().scrollTop = this._scrollPosition;
     this._api.deleteComment(this._comments[index])
       .then(() => {
         this._data = Popup.parseDataToFilm(this._data);
@@ -438,10 +432,10 @@ export default class Popup extends SmartView {
     ];
   }
 
-  _scrollHandler(evt) {
-    evt.preventDefault();
-    this._scrollPosition = evt.target.offsetHeight;
-  }
+  // _scrollHandler(evt) {
+  //   evt.preventDefault();
+  //   this._scrollPosition = evt.target.offsetHeight;
+  // }
 
   restoreHandlers() {
     this._setInnerHandlers();
