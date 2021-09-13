@@ -3,6 +3,8 @@ import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
 import { UpdateType, UserAction } from '../const.js';
 import he from 'he';
+import { toast } from '../utils/toast.js';
+import { isOnline } from '../utils/common.js';
 
 const createCommentTemplate = (comment, deletingId) => (
   ` <li class="film-details__comment">
@@ -175,7 +177,7 @@ const createPopupTemplate = (data, newComment, correctComments) => {
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
       <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${comments.length}</span></h3>
-      ${isComments ? createCommentsTemplate(correctComments, deletingId) : ''}
+      ${isComments && correctComments ? createCommentsTemplate(correctComments, deletingId) : ''}
       ${createNewCommentTemplate(newComment, isDisabled)}
       </section>
     </div>
@@ -379,7 +381,10 @@ export default class Popup extends SmartView {
             });
             const newCommentsElement = this.getElement().querySelector('.film-details__new-comment');
             this.shake(newCommentsElement, resetDisabled);
-
+            this.getElement().scrollTop = this._scrollPosition;
+            if (!isOnline()) {
+              toast('You can\'t add comments offline');
+            }
           });
         this._newComment = {};
       }
@@ -421,7 +426,12 @@ export default class Popup extends SmartView {
         });
         const commentsElement = this.getElement().querySelector('.film-details__comments-list');
         this.shake(commentsElement, resetDisabled);
+        this.getElement().scrollTop = this._scrollPosition;
+        if (!isOnline()) {
+          toast('You can\'t delete comments offline');
+        }
       });
+
   }
 
   _delete(comments, update) {
@@ -431,11 +441,6 @@ export default class Popup extends SmartView {
       ...comments.slice(index + 1),
     ];
   }
-
-  // _scrollHandler(evt) {
-  //   evt.preventDefault();
-  //   this._scrollPosition = evt.target.offsetHeight;
-  // }
 
   restoreHandlers() {
     this._setInnerHandlers();

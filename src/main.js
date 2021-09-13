@@ -1,5 +1,7 @@
 import HeaderView from './view/header.js';
 import { render, InsertPlace, remove } from './utils/render.js';
+//import {isOnline} from './utils/common.js';
+import { toast } from './utils/toast.js';
 import PagePresenter from './presenter/page.js';
 import FilterPresenter from './presenter/filters.js';
 import FilmsModel from './model/films.js';
@@ -7,11 +9,19 @@ import CommentsModel from './model/comments.js';
 import FilterModel from './model/filters.js';
 import StatisticsView from './view/stats.js';
 import { FilterType, UpdateType } from './const.js';
-import Api from './api.js';
+import Api from './api/api.js';
+import Store from './api/store.js';
+import Provider from './api/provider.js';
 
 const AUTHORIZATION = 'Basic od145nrzbxy';
 const END_POINT = 'https://15.ecmascript.pages.academy/cinemaddict';
 const api = new Api(END_POINT, AUTHORIZATION);
+const STORE_PREFIX = 'cinemaddict-localstorage';
+const STORE_VER = 'v15';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
+
+const store = new Store(STORE_NAME, window.localStorage);
+const apiWithProvider = new Provider(api, store);
 
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
@@ -19,7 +29,7 @@ const filterModel = new FilterModel();
 
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
-const pagePresenter = new PagePresenter(siteMainElement, filmsModel, filterModel, commentsModel, api);
+const pagePresenter = new PagePresenter(siteMainElement, filmsModel, filterModel, commentsModel, apiWithProvider);
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, handleSiteMenuClick);
 render(siteHeaderElement, new HeaderView().getElement(), InsertPlace.BEFORE_END);
 filterPresenter.init();
@@ -38,10 +48,23 @@ function handleSiteMenuClick(filterType) {
   remove(staticElement);
 
 }
-api.getFilms()
+apiWithProvider.getFilms()
   .then((films) => {
     filmsModel.setFilms(UpdateType.INIT, films);
   })
   .catch(() => {
     filmsModel.setFilms(UpdateType.INIT, []);
   });
+
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
+window.addEventListener('online', () => {
+  document.title = document.title.replace(' [offline]', '');
+  apiWithProvider.sync();
+});
+
+window.addEventListener('offline', () => {
+  document.title += ' [offline]';
+  toast('You are offline');
+});
