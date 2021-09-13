@@ -1,5 +1,5 @@
-import FilmsModel from './model/films';
-import CommentsModel from './model/comments';
+import FilmsModel from '../model/films';
+import CommentsModel from '../model/comments';
 
 const Method = {
   GET: 'GET',
@@ -87,6 +87,17 @@ export default class Api {
       method: Method.DELETE,
     });
   }
+
+  sync(data) {
+    return this._load({
+      url: '/movies/sync',
+      method: Method.POST,
+      body: JSON.stringify(data),
+      headers: new Headers({'Content-Type': 'application/json'}),
+    })
+      .then(Api.toJSON);
+  }
+
 
   static toJSON(response) {
     return response.json();

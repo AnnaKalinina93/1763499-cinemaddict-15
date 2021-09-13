@@ -37,4 +37,7 @@ const updateItem = (items, update) => {
     ...items.slice(index + 1),
   ];
 };
-export { getRandomArrayElement, getRandomInteger, getRandomArray, getRandomFractionalNumber , updateItem};
+
+const isOnline = () => window.navigator.onLine;
+
+export { getRandomArrayElement, getRandomInteger, getRandomArray, getRandomFractionalNumber , updateItem, isOnline};
