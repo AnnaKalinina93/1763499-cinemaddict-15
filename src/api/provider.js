@@ -1,11 +1,5 @@
 import FilmsModel from '../model/films.js';
-//import CommentsModel from '../model/comments.js';
 import { isOnline } from '../utils/common.js';
-
-// const getSyncedFilms = (items) =>
-//   items
-//     .filter(({ success }) => success)
-//     .map(({ payload }) => payload.film);
 
 const createStoreStructure = (items) =>
   items
@@ -53,15 +47,9 @@ export default class Provider {
     if (isOnline()) {
       return this._api.getComments(filmId)
         .then((comments) => comments);
-      //   const items = createStoreStructure(comments.map(CommentsModel.adaptToServer));
-      //   this._store.setItems(items);
-      //   return comments;
-      // });
+
     }
 
-    // const storeComments = Object.values(this._store.getItems());
-
-    // return Promise.resolve(storeComments.map(CommentsModel.adaptToClient));
     return Promise.reject(new Error('Get comments failed'));
   }
 
@@ -70,7 +58,6 @@ export default class Provider {
       return this._api.addComment(film, comment)
         .then((data) => {
           this._store.setItem(data.film.id, FilmsModel.adaptToServer(data.film));
-          // this._store.setItem(data.comments.id, data.comments.map(CommentsModel.adaptToClient));
           return data;
         });
     }
@@ -81,7 +68,6 @@ export default class Provider {
   deleteComment(comment) {
     if (isOnline()) {
       return this._api.deleteComment(comment);
-      //  .then(() => this._store.removeItem(comment.id));
     }
 
     return Promise.reject(new Error('Delete comment failed'));
@@ -93,12 +79,7 @@ export default class Provider {
 
       return this._api.sync(storeFilms)
         .then((response) => {
-          // Забираем из ответа синхронизированные задачи
-          // const createdFilms = response.created? getSyncedFilms(response.created): null;
           const updatedFilms = response.updated;
-
-          // Добавляем синхронизированные задачи в хранилище.
-          // Хранилище должно быть актуальным в любой момент.
           const items = createStoreStructure([...updatedFilms]);
 
           this._store.setItems(items);
