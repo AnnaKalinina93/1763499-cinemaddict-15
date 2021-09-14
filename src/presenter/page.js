@@ -245,8 +245,12 @@ export default class Page {
       if (filmsCount > this._renderedCount) {
         this._renderShowMoreButton();
       }
-      this._renderAdditionalFilmList(TOP_NAME, topSortFunction, this._renderTopFilm, films);
-      this._renderAdditionalFilmList(MOST_COMMENTED_NAME, commentedSortFunction, this._renderCommentedFilm, films);
+      if (films.filter((film) => film.filmInfo.totalRating !== 0).length !== 0) {
+        this._renderAdditionalFilmList(TOP_NAME, topSortFunction, this._renderTopFilm, films);
+      }
+      if (films.filter((film) => film.comments.length !== 0).length !== 0) {
+        this._renderAdditionalFilmList(MOST_COMMENTED_NAME, commentedSortFunction, this._renderCommentedFilm, films);
+      }
       this._renderFooter(this._filmsModel.getFilms());
     }
   }

@@ -91,6 +91,9 @@ export default class Film {
   }
 
   _handleFavoriteClick(scroll) {
+    if ( this._filterType === FilterType.FAVORITES) {
+      this._siteBodyElement.classList.remove('hide-overflow');
+    }
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
@@ -108,6 +111,9 @@ export default class Film {
   }
 
   _handleWatchlistClick(scroll) {
+    if ( this._filterType === FilterType.WATCHLIST) {
+      this._siteBodyElement.classList.remove('hide-overflow');
+    }
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.WATCHLIST ? UpdateType.PATCH : UpdateType.MINOR,
@@ -125,6 +131,9 @@ export default class Film {
   }
 
   _handleAlreadyWatchedClick(scroll) {
+    if ( this._filterType === FilterType.HISTORY) {
+      this._siteBodyElement.classList.remove('hide-overflow');
+    }
     this._changeData(
       UserAction.UPDATE_FILM,
       this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,
@@ -150,6 +159,7 @@ export default class Film {
   _handleCloseClick() {
     this._closePopupFilm();
     document.removeEventListener('keydown', this._onEscKeyDown);
+    this._changeData(UserAction.UPDATE_FILM,UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
   }
 
   _openPopupFilm() {
@@ -166,10 +176,7 @@ export default class Film {
   _closePopupFilm() {
 
     this._siteBodyElement.classList.remove('hide-overflow');
-    this._changeData(UserAction.UPDATE_FILM,
-      this._filterType !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR, this._film, this._comments, this._scrollPosition);
     this._popupComponent.getElement().remove();
-
     this._mode = Mode.DEFAULT;
   }
 
@@ -178,6 +185,7 @@ export default class Film {
       evt.preventDefault();
       this._closePopupFilm();
       document.removeEventListener('keydown', this._onEscKeyDown);
+      this._changeData(UserAction.UPDATE_FILM,UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
     }
   }
 
