@@ -1,4 +1,4 @@
-import { getDayMonthFormat, getYearsFormat, getTimeFormat } from '../day.js';
+import { getDayMonthFormat, getYearsFormat, getTimeCommented } from '../day.js';
 import SmartView from './smart.js';
 import { generateRuntime } from '../day.js';
 import { UpdateType, UserAction } from '../const.js';
@@ -15,7 +15,7 @@ const createCommentTemplate = (comment, deletingId) => (
             <p class="film-details__comment-text">${he.encode(comment.text)}</p>
             <p class="film-details__comment-info" >
               <span class="film-details__comment-author">${comment.avtor}</span>
-              <span class="film-details__comment-day">${getDayMonthFormat(comment.dueDate)} ${getTimeFormat(comment.dueDate)}</span>
+              <span class="film-details__comment-day">${getTimeCommented(comment.dueDate)}</span>
               <button class="film-details__comment-delete" id=${comment.id}> ${deletingId === comment.id ? 'Deleting...' : 'Delete'}</button>
             </p>
           </div>
