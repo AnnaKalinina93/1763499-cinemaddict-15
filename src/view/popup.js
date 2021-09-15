@@ -257,8 +257,6 @@ export default class Popup extends SmartView {
     this.getElement().querySelector('.film-details__close-btn').addEventListener('click', this._clickHandler);
   }
 
-  // парсим входные данные
-
   static parseFilmToData(film) {
     return Object.assign(
       {},
@@ -310,7 +308,6 @@ export default class Popup extends SmartView {
     document.addEventListener('keydown', this._sendCommentHandler);
     const buttons = this.getElement().querySelectorAll('.film-details__comment-delete');
     Array.from(buttons).forEach((button) => button.addEventListener('click', this._deleteCommentHandlers));
-    //this.getElement().addEventListener('scroll', this._scrollHandler);
   }
 
   _textInputHandler(evt) {
@@ -357,8 +354,6 @@ export default class Popup extends SmartView {
     this.getElement().scrollTop = this._scrollPosition;
   }
 
-  // отправка комментария
-
   _sendCommentHandler(evt) {
     if (evt.ctrlKey && evt.key === 'Enter') {
       evt.preventDefault();
@@ -390,8 +385,6 @@ export default class Popup extends SmartView {
       }
     }
   }
-
-  // удаляем комментарии
 
   _deleteCommentHandlers(evt) {
     evt.preventDefault();

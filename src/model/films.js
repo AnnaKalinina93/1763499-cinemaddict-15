@@ -6,7 +6,7 @@ export default class Films extends AbstractObserver {
     this._films = [];
   }
 
-  setFilms(updateType,films) {
+  setFilms(updateType, films) {
     this._films = films.slice();
     this._notify(updateType);
   }
@@ -39,7 +39,7 @@ export default class Films extends AbstractObserver {
         filmInfo: {
           title: film['film_info']['title'],
           alternativeTitle: film['film_info']['alternative_title'],
-          totalRating:film['film_info']['total_rating'],
+          totalRating: film['film_info']['total_rating'],
           poster: film['film_info']['poster'],
           ageRating: film['film_info']['age_rating'],
           director: film['film_info']['director'],
@@ -55,13 +55,12 @@ export default class Films extends AbstractObserver {
         },
         userDetails: {
           watchlist: film['user_details']['watchlist'],
-          alreadyWatched:film['user_details']['already_watched'] ,
-          watchingDate:film['user_details']['watching_date'],
+          alreadyWatched: film['user_details']['already_watched'],
+          watchingDate: film['user_details']['watching_date'],
           favorite: film['user_details']['favorite'],
         },
       });
 
-    // Ненужные ключи мы удаляем
     delete adaptedFilm['film_info'];
     delete adaptedFilm['user_details'];
 
@@ -76,7 +75,7 @@ export default class Films extends AbstractObserver {
         'film_info': {
           'title': film.filmInfo.title,
           'alternative_title': film.filmInfo.alternativeTitle,
-          'total_rating':film.filmInfo.totalRating,
+          'total_rating': film.filmInfo.totalRating,
           'poster': film.filmInfo.poster,
           'age_rating': film.filmInfo.ageRating,
           'director': film.filmInfo.director,
@@ -92,17 +91,15 @@ export default class Films extends AbstractObserver {
         },
         'user_details': {
           'watchlist': film.userDetails.watchlist,
-          'already_watched':film.userDetails.alreadyWatched ,
-          'watching_date':film.userDetails.watchingDate,
+          'already_watched': film.userDetails.alreadyWatched,
+          'watching_date': film.userDetails.watchingDate,
           'favorite': film.userDetails.favorite,
         },
       },
     );
 
-    // Ненужные ключи мы удаляем
     delete adaptedFilm.filmInfo;
     delete adaptedFilm.userDetails;
-
     return adaptedFilm;
   }
 }

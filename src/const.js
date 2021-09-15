@@ -29,6 +29,19 @@ export const FilterType = {
   FAVORITES: 'favorites',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
-  STATISTICS:'statistics',
+  STATISTICS: 'statistics',
 };
 
+export const RankType = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie buff',
+};
+
+export const CurrentType = {
+  All: 'allTime',
+  TODAY: 'today',
+  WEEK: 'week',
+  MONTH: 'month',
+  YEAR: 'year',
+};

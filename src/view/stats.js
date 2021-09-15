@@ -1,19 +1,11 @@
 import SmartView from './smart.js';
 import { filter } from '../utils/filters.js';
-import { FilterType } from '../const.js';
+import { FilterType, CurrentType, RankType } from '../const.js';
 import dayjs from 'dayjs';
 import { completedFimsInDateRange } from '../day.js';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import { getNumbeFilmsByGenre, getSortGenresFilms } from '../utils/filters.js';
-const CurrentType = {
-  All: 'allTime',
-  TODAY: 'today',
-  WEEK: 'week',
-  MONTH: 'month',
-  YEAR: 'year',
-};
-
 
 const createFilmsChart = (statisticCtx, genresByFilms) => {
   const BAR_HEIGHT = 50;
@@ -78,26 +70,42 @@ const createFilmsChart = (statisticCtx, genresByFilms) => {
     },
   });
 };
+
+const createRankTitle = (historyFilms) => {
+  let rank = '';
+  if (historyFilms.length <= 10 && historyFilms.length > 0) {
+    rank = RankType.NOVICE;
+  }
+  if (10 < historyFilms.length && historyFilms.length <= 20) {
+    rank = RankType.FAN;
+  }
+  if (historyFilms.length > 20) {
+    rank = RankType.MOVIE_BUFF;
+  }
+
+  return `<p class="statistic__rank">
+  Your rank
+  <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+  <span class="statistic__rank-label">${rank}</span>
+</p>`;
+};
 const createStatisticsTemplate = (data) => {
   let films = [];
   let currentType = null;
   let genres = null;
   let totalDuration = 0;
   let genresArray = [];
+  let historyFilms = [];
   if (data) {
     films = data.films;
+    historyFilms = films.filter((film) => film.userDetails.alreadyWatched);
     currentType = data.currentType;
     genres = data.genres;
     totalDuration = films.length !== 0 ? films.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b) : 0;
     genresArray = genres ? Object.keys(genres) : null;
   }
   return `<section class="statistic">
-    <p class="statistic__rank">
-      Your rank
-      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">Movie buff</span>
-    </p>
-
+    ${historyFilms.length !== 0 ? createRankTitle(historyFilms) : ''}
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
 
