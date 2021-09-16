@@ -23,8 +23,4 @@ export default class NoFilms extends AbstractView {
     return createNoFilmsTemplate(this._data);
   }
 }
-/*
-All movies – 'There are no movies in our database'
-          * Watchlist — 'There are no movies to watch now';
-          * History — 'There are no watched movies now';
-          * Favorites — 'There are no favorite movies now'.*/
+

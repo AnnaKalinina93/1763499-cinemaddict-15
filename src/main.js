@@ -1,6 +1,4 @@
-import HeaderView from './view/header.js';
 import { render, InsertPlace, remove } from './utils/render.js';
-//import {isOnline} from './utils/common.js';
 import { toast } from './utils/toast.js';
 import PagePresenter from './presenter/page.js';
 import FilterPresenter from './presenter/filters.js';
@@ -30,8 +28,7 @@ const filterModel = new FilterModel();
 const siteHeaderElement = document.querySelector('.header');
 const siteMainElement = document.querySelector('.main');
 const pagePresenter = new PagePresenter(siteMainElement, filmsModel, filterModel, commentsModel, apiWithProvider);
-const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, handleSiteMenuClick);
-render(siteHeaderElement, new HeaderView().getElement(), InsertPlace.BEFORE_END);
+const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel, handleSiteMenuClick, siteHeaderElement);
 filterPresenter.init();
 const staticElement = new StatisticsView();
 pagePresenter.init();

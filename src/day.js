@@ -1,22 +1,10 @@
 import dayjs from 'dayjs';
-//import isBetween from 'dayjs/plugin/isBetween';
-//import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-//import { getRandomInteger } from './utils/common.js';
 import duration from 'dayjs/plugin/duration';
 import relativeTime from 'dayjs/plugin/relativeTime';
 dayjs.extend(duration);
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
 dayjs.extend(relativeTime);
-
-
-// const generateDate = () => {
-//   const maxDaysGap = 20;
-//   const yearsGap = getRandomInteger(-2, 0);
-//   const daysGap = getRandomInteger(-maxDaysGap, maxDaysGap);
-//   const hoursGap = getRandomInteger(-12, 12);
-//   return dayjs().add(daysGap, 'day').add(yearsGap, 'year').add(hoursGap, 'hour').toDate();
-// };
 
 const getDayMonthFormat = (dueDate) => dayjs(dueDate).format('D MMMM');
 const getYearsFormat = (dueDate) => dayjs(dueDate).format('YYYY');
