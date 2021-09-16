@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-export const SortType = {
+const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING: 'rating',
@@ -46,6 +46,7 @@ const CurrentType = {
 };
 
 export {
+  SortType,
   UserAction,
   UpdateType,
   Mode,
