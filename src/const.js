@@ -5,26 +5,25 @@ export const SortType = {
   RATING: 'rating',
 };
 
-
-export const UserAction = {
+const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
   ADD_COMMENTS: 'ADD_COMMENTS',
   DELETE_COMMENTS: 'DELETE_COMMENTS',
 };
 
-export const UpdateType = {
+const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
 };
 
-export const Mode = {
+const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP',
 };
 
-export const FilterType = {
+const FilterType = {
   ALL: 'all',
   FAVORITES: 'favorites',
   WATCHLIST: 'watchlist',
@@ -32,16 +31,25 @@ export const FilterType = {
   STATISTICS: 'statistics',
 };
 
-export const RankType = {
+const RankType = {
   NOVICE: 'Novice',
   FAN: 'Fan',
   MOVIE_BUFF: 'Movie buff',
 };
 
-export const CurrentType = {
+const CurrentType = {
   All: 'allTime',
   TODAY: 'today',
   WEEK: 'week',
   MONTH: 'month',
   YEAR: 'year',
+};
+
+export {
+  UserAction,
+  UpdateType,
+  Mode,
+  FilterType,
+  RankType,
+  CurrentType
 };

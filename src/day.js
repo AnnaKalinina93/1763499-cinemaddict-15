@@ -23,4 +23,11 @@ const getTimeCommented = (dueDate) => dayjs(dueDate).fromNow();
 const completedFimsInDateRange = (films, dateFrom, dateTo, format) =>
   films.filter((film) => dayjs(film.userDetails.watchingDate).isBetween(dateFrom, dateTo, format, '[)'));
 
-export { getDayMonthFormat, getYearsFormat, getTimeFormat, generateRuntime, completedFimsInDateRange, getTimeCommented };
+export {
+  getDayMonthFormat,
+  getYearsFormat,
+  getTimeFormat,
+  generateRuntime,
+  completedFimsInDateRange,
+  getTimeCommented
+};
