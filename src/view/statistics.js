@@ -94,7 +94,7 @@ const createStatisticsTemplate = (data) => {
   let currentType = null;
   let genres = null;
   let totalDuration = 0;
-  let genresArray = [];
+  let sortGenres = [];
   let historyFilms = [];
   if (data) {
     films = data.films;
@@ -102,7 +102,7 @@ const createStatisticsTemplate = (data) => {
     currentType = data.currentType;
     genres = data.genres;
     totalDuration = films.length !== 0 ? films.map((film) => film.filmInfo.runTime).reduce((a, b) => a + b) : 0;
-    genresArray = genres ? Object.keys(genres) : null;
+    sortGenres = genres ? Object.keys(genres) : null;
   }
   return `<section class="statistic">
     ${historyFilms.length !== 0 ? createRankTitle(historyFilms) : ''}
@@ -136,7 +136,7 @@ const createStatisticsTemplate = (data) => {
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Top genre</h4>
-        <p class="statistic__item-text">${genresArray.length !== 0 ? genresArray[0] : ''}</p>
+        <p class="statistic__item-text">${sortGenres.length !== 0 ? sortGenres[0] : ''}</p>
       </li>
     </ul>
 

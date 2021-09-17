@@ -8,8 +8,8 @@ const filter = {
 };
 
 const getGenres = (films) => {
-  const allGenresArray = films.map((film) => film.filmInfo.genres).flat();
-  return [...new Set(allGenresArray)];
+  const allGenres = films.map((film) => film.filmInfo.genres).flat();
+  return [...new Set(allGenres)];
 
 };
 
@@ -27,10 +27,10 @@ const getNumbeFilmsByGenre = (films) => {
   return result;
 };
 
-const getSortGenresFilms = (obj) => {
-  const newObj = {};
-  Object.keys(obj).sort((a, b) => obj[b] - obj[a]).forEach((i) => newObj[i] = obj[i]);
-  return newObj;
+const getSortGenresFilms = (genres) => {
+  const sortGenres = {};
+  Object.keys(genres).sort((a, b) => genres[b] - genres[a]).forEach((i) => sortGenres[i] = genres[i]);
+  return sortGenres;
 };
 
 export {

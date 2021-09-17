@@ -19,7 +19,7 @@ export default class Film {
 
     this._handleOpenClick = this._handleOpenClick.bind(this);
     this._handleCloseClick = this._handleCloseClick.bind(this);
-    this._onEscKeyDown = this._onEscKeyDown.bind(this);
+    this._handleEscKeyDown = this._handleEscKeyDown.bind(this);
     this._handleWatchlistClick = this._handleWatchlistClick.bind(this);
     this._handleAlreadyWatchedClick = this._handleAlreadyWatchedClick.bind(this);
     this._handleFavoriteClick = this._handleFavoriteClick.bind(this);
@@ -152,13 +152,13 @@ export default class Film {
 
   _handleOpenClick() {
     this._openPopupFilm();
-    document.addEventListener('keydown', this._onEscKeyDown);
+    document.addEventListener('keydown', this._handleEscKeyDown);
     this._siteBodyElement.classList.add('hide-overflow');
   }
 
   _handleCloseClick() {
     this._closePopupFilm();
-    document.removeEventListener('keydown', this._onEscKeyDown);
+    document.removeEventListener('keydown', this._handleEscKeyDown);
     this._changeData(UserAction.UPDATE_FILM,UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
   }
 
@@ -180,11 +180,11 @@ export default class Film {
     this._mode = Mode.DEFAULT;
   }
 
-  _onEscKeyDown(evt) {
+  _handleEscKeyDown(evt) {
     if (isEscape(evt)) {
       evt.preventDefault();
       this._closePopupFilm();
-      document.removeEventListener('keydown', this._onEscKeyDown);
+      document.removeEventListener('keydown', this._handleEscKeyDown);
       this._changeData(UserAction.UPDATE_FILM,UpdateType.MINOR,this._film, this._comments, this._scrollPosition);
     }
   }

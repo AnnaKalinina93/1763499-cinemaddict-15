@@ -1,11 +1,11 @@
 import ButtonView from '../view/button.js';
-import SiteFilmsContainerView from '../view/films-container.js';
+import SiteFilmsContainerView from '../view/site-films-container.js';
 import NameFilmListView from '../view/name-film-list.js';
 import FilmListContainerView from '../view/film-list-container.js';
 import AdditionalContainerView from '../view/additional-container.js';
 import NumbersFilmsView from '../view/numbers-films.js';
 import NoFilmsView from '../view/no-films.js';
-import SiteSortView from '../view/sort.js';
+import SiteSortView from '../view/site-sort.js';
 import LoadingView from '../view/loading.js';
 import { render, InsertPlace, remove, replace } from '../utils/render.js';
 import { topSortFunction, commentedSortFunction, sortFilmRating, sortFilmDate } from '../utils/sort.js';

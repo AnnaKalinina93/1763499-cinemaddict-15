@@ -1,11 +1,11 @@
 import { render, InsertPlace, remove } from './utils/render.js';
 import { toast } from './utils/toast.js';
 import PagePresenter from './presenter/page.js';
-import FilterPresenter from './presenter/filters.js';
+import FilterPresenter from './presenter/filter.js';
 import FilmsModel from './model/films.js';
 import CommentsModel from './model/comments.js';
-import FilterModel from './model/filters.js';
-import StatisticsView from './view/stats.js';
+import FilterModel from './model/filter.js';
+import StatisticsView from './view/statistics.js';
 import { FilterType, UpdateType } from './const.js';
 import Api from './api/api.js';
 import Store from './api/store.js';

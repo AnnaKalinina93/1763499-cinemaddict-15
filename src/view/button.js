@@ -1,8 +1,7 @@
-/* eslint-disable quotes */
 import AbstractView from './abstract';
 
 const createButtonTemplate = () => (
-  `<button class="films-list__show-more">Show more</button>`
+  '<button class="films-list__show-more">Show more</button>'
 );
 export default class Button extends AbstractView {
   constructor() {
