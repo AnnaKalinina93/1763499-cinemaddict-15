@@ -3,7 +3,9 @@
 * Студент: [Анна Калинина](https://up.htmlacademy.ru/ecmascript/15/user/1763499).
 * Наставник: [Денис Горшков](https://htmlacademy.ru/profile/satrasmatras).
 
+ТЗ: https://docs.google.com/document/d/1WMf6fXExkaBFX-X1IDR3lTfa5pxCn5nn-CygKPIepkk/edit?usp=sharing Сайт по поиску кино
 ---
+Проект реализован на JS с применением ООП, модель MVC. 
 
 _Не удаляйте и не изменяйте папки и файлы:_
 _`.editorconfig`, `.gitattributes`._
